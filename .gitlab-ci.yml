@@ -22,25 +22,53 @@ stages:
     - apk add bash curl tar
     - source scripts/helpers.sh
     - docker_login
-    - 'image=$(echo $CI_JOB_NAME | cut -d : -f 2)'
+    - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
     - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $image'
+
+.single-image-build-base:
+  extends:
+    - .image-build-base
+  script:
+    - !reference [.image-build-base, script]
     - build_image $image $CI_PIPELINE_ID
     - push_image $image $CI_PIPELINE_ID
 
-container:mise:
+.variant-image-build-base:
   extends:
     - .image-build-base
+  script:
+    - !reference [.image-build-base, script]
+    - build_image $image $CI_PIPELINE_ID "--build-arg VARIANT=$VARIANT"
+    - image_tag=$(get_image_tag $CI_PIPELINE_ID $VARIANT)
+    - retag_image $image $CI_PIPELINE_ID $image_tag
+    - push_image $image $image_tag
+
+container:mise:
+  extends:
+    - .single-image-build-base
 
 container:rust:
   extends:
-    - .image-build-base
+    - .single-image-build-base
   needs:
     - container:mise
 
 container:aquila:
   extends:
-    - .image-build-base
+    - .single-image-build-base
   needs:
     - container:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+
+container:draco:
+  extends:
+    - .variant-image-build-base
+  needs:
+    - container:rust
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
+  parallel:
+    matrix:
+      - VARIANT:
+          - rest

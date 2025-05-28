@@ -4,8 +4,9 @@ set -e
 
 source scripts/helpers.sh
 
-rm -rf projects
-mkdir projects
+rm -rf projects/*
+mkdir -p projects
 
 download_project aquila
+download_project draco
 download_project sagittarius

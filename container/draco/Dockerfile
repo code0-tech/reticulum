@@ -1,14 +1,17 @@
 ARG RETICULUM_IMAGE_TAG=local
 
 FROM ghcr.io/code0-tech/reticulum/ci-builds/rust:$RETICULUM_IMAGE_TAG AS builder
+ARG VARIANT
 
-WORKDIR /aquila
-COPY projects/aquila .
+WORKDIR /draco
+COPY projects/draco .
+WORKDIR /draco/adapters/$VARIANT
 RUN cargo build --release
 
 FROM alpine:3.21
+ARG VARIANT
 
 RUN apk --update add libc6-compat
-COPY --from=builder /aquila/target/release/aquila .
+COPY --from=builder /draco/target/release/$VARIANT /draco
 
-CMD ["/aquila"]
+CMD ["/draco"]
