@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+source scripts/helpers.sh
+
+rm -rf projects
+mkdir projects
+
+download_project aquila
+download_project sagittarius
