@@ -16,6 +16,7 @@ function docker_login() {
 function build_image() {
   image=$1
   reticulum_tag=$2
+  build_args=$3
 
   echo "Building image for $image"
 
@@ -28,9 +29,29 @@ function build_image() {
     -t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" \
     -f "container/$image/Dockerfile" \
     --build-arg RETICULUM_IMAGE_TAG=$reticulum_tag \
+    $build_args \
     .
 }
 
 function push_image() {
+  image=$1
+  reticulum_tag=$2
   docker push "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag"
+}
+
+function retag_image() {
+  image=$1
+  reticulum_tag=$2
+  variant_tag=$3
+  docker image tag "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" "ghcr.io/code0-tech/reticulum/ci-builds/$image:$variant_tag"
+}
+
+function get_image_tag() {
+  reticulum_tag=$1
+  reticulum_variant=$2
+  if [ -z "$reticulum_variant" ]; then
+    echo $reticulum_tag
+  else
+    echo $reticulum_tag-$reticulum_variant
+  fi
 }
