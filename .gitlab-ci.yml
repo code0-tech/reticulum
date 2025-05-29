@@ -72,3 +72,11 @@ container:draco:
     matrix:
       - VARIANT:
           - rest
+
+container:taurus:
+  extends:
+    - .single-image-build-base
+  needs:
+    - container:rust
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
