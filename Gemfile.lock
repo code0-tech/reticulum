@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    erb (5.0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  erb
+
+BUNDLED WITH
+   2.6.6

@@ -16,10 +16,9 @@ stages:
 .image-build-base:
   extends:
     - .dind
-  image: docker:28.1.1
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:155.1-ruby-3.2.2
   stage: container
   script:
-    - apk add bash curl tar
     - source scripts/helpers.sh
     - docker_login
     - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
@@ -80,3 +79,29 @@ container:taurus:
     - container:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+
+container:ruby:
+  extends:
+    - .single-image-build-base
+  needs:
+    - container:mise
+
+container:postgresql:
+  extends:
+    - .single-image-build-base
+  needs:
+    - container:mise
+
+container:sagittarius:
+  extends:
+    - .variant-image-build-base
+  needs:
+    - container:ruby
+    - container:postgresql
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee

@@ -1,0 +1,54 @@
+ARG RETICULUM_IMAGE_TAG=local
+
+FROM ghcr.io/code0-tech/reticulum/ci-builds/postgresql:$RETICULUM_IMAGE_TAG AS pg_image
+FROM ghcr.io/code0-tech/reticulum/ci-builds/ruby:$RETICULUM_IMAGE_TAG
+
+# libressl-dev needed for building pg gem
+# libc6-compat needed for grpc
+RUN apk add libressl-dev libc6-compat
+
+COPY --from=pg_image /usr/local/share/postgres/bin /usr/local/share/postgres/bin
+COPY --from=pg_image /usr/local/share/postgres/lib /usr/local/share/postgres/lib
+COPY --from=pg_image /usr/local/share/postgres/include /usr/local/share/postgres/include
+
+WORKDIR /sagittarius
+COPY projects/sagittarius .
+
+# Set production environment
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development:test"
+
+# Install application gems
+COPY projects/sagittarius/Gemfile projects/sagittarius/Gemfile.lock ./
+RUN bundle config build.pg --with-pg-config=/usr/local/share/postgres/bin/pg_config && \
+    bundle install && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+    bundle exec bootsnap precompile --gemfile
+
+# Copy application code
+COPY projects/sagittarius/log/ log/
+COPY projects/sagittarius/storage/ storage/
+COPY projects/sagittarius/tmp/ tmp/
+COPY projects/sagittarius/bin/ bin/
+COPY projects/sagittarius/public/ public/
+COPY projects/sagittarius/Rakefile Rakefile
+COPY projects/sagittarius/config.ru config.ru
+COPY projects/sagittarius/config/ config/
+COPY projects/sagittarius/lib/ lib/
+COPY projects/sagittarius/db/ db/
+COPY projects/sagittarius/app/ app/
+<% if ee? %>
+COPY projects/sagittarius/extensions/ee/app/ extensions/ee/app/
+<% end %>
+
+# Precompile bootsnap code for faster boot times
+RUN bundle exec bootsnap precompile app/ lib/ <% if ee? %>extensions/ee/app/<% end %>
+
+# Entrypoint prepares the database.
+ENTRYPOINT ["/sagittarius/bin/docker-entrypoint"]
+
+# Start the server by default, this can be overwritten at runtime
+EXPOSE 3000
+CMD ["./bin/rails", "server"]
