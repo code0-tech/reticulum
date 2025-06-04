@@ -12,7 +12,6 @@ COPY --from=pg_image /usr/local/share/postgres/lib /usr/local/share/postgres/lib
 COPY --from=pg_image /usr/local/share/postgres/include /usr/local/share/postgres/include
 
 WORKDIR /sagittarius
-COPY projects/sagittarius .
 
 # Set production environment
 ENV RAILS_ENV="production" \
