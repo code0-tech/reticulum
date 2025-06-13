@@ -1,0 +1,2 @@
+# .erb is detected as HTML by default
+Dockerfile.erb linguist-language=Dockerfile
