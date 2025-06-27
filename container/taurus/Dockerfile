@@ -6,7 +6,7 @@ WORKDIR /taurus
 COPY projects/taurus .
 RUN cargo build --release
 
-FROM alpine:3.21
+FROM alpine:3.22
 
 RUN apk --update add libc6-compat
 COPY --from=builder /taurus/target/release/taurus .
