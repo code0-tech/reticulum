@@ -1,6 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "github>code0-tech/monoceros//renovate/global.json5",
+    ":assignee(Taucher2003)"
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["ruby"],
+      "dependencyDashboardApproval": true
+    }
   ]
 }
