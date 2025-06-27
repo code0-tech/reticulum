@@ -8,7 +8,7 @@ COPY projects/draco .
 WORKDIR /draco/adapters/$VARIANT
 RUN cargo build --release
 
-FROM alpine:3.21
+FROM alpine:3.22
 ARG VARIANT
 
 RUN apk --update add libc6-compat
