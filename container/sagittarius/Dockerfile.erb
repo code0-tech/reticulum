@@ -17,7 +17,8 @@ WORKDIR /sagittarius
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development:test"
+    BUNDLE_WITHOUT="development:test" \
+    PATH="$PATH:/usr/local/share/postgres/bin"
 
 # Install application gems
 COPY projects/sagittarius/Gemfile projects/sagittarius/Gemfile.lock ./

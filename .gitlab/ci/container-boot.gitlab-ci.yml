@@ -1,0 +1,60 @@
+.container:boot:
+  extends:
+    - .dind
+  stage: container:boot
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:171.1-ruby-3.2.2
+
+.container:boot:sagittarius:
+  extends:
+    - .container:boot
+  needs:
+    - container:sagittarius
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+  variables:
+    SAGITTARIUS_IMAGE: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${CI_PIPELINE_ID}-${VARIANT}
+    CURL_IMAGE: curlimages/curl:8.5.0
+  before_script:
+    - docker network create boot
+    - >
+      docker run
+      --detach
+      --name postgres
+      --network boot
+      --network-alias postgres
+      --env POSTGRES_USER=sagittarius
+      --env POSTGRES_PASSWORD=sagittarius
+      --env POSTGRES_DB=sagittarius_production
+      postgres:16.1
+    - docker pull $SAGITTARIUS_IMAGE
+    - docker pull $CURL_IMAGE
+    - >
+      docker run
+      --name sagittarius
+      --network boot
+      --network-alias sagittarius
+      --volume $(pwd)/container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+      $SAGITTARIUS_IMAGE
+      $SAGITTARIUS_CMD &
+
+container:boot:sagittarius:rails-web:
+  extends:
+    - .container:boot:sagittarius
+  variables:
+    SAGITTARIUS_CMD: ""
+  script:
+    - >
+      docker run
+      --rm
+      --network boot
+      $CURL_IMAGE
+      curl
+      --fail
+      -sv
+      --retry 20
+      --retry-delay 3
+      --retry-connrefused
+      http://sagittarius:3000/health/liveness
