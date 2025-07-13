@@ -1,0 +1,76 @@
+#!/usr/bin/env ruby
+
+require 'grpc'
+require 'optparse'
+require 'grpc/health/v1/health_services_pb'
+
+options = {
+  retries: 5,
+  backoff: 3,
+  service: '',
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = 'Usage: grpc_check_health [options]'
+
+  opts.on('-h', '--host [HOST]', String, 'Host of the grpc server to check') do |host|
+    options[:host] = host
+  end
+
+  opts.on('-r', '--retries [RETRIES]', Integer, "Amount of retries (Default: #{options[:retries]})") do |retries|
+    options[:retries] = retries
+  end
+
+  opts.on('-b', '--backoff [BACKOFF]', Integer, "Backoff in seconds for each attempt (Default: #{options[:backoff]})") do |backoff|
+    options[:backoff] = backoff
+  end
+
+  opts.on('-s', '--service [SERVICE]', String, "Service check health for (Default: '#{options[:service]}')") do |service|
+    options[:service] = service
+  end
+end
+optparse.parse!
+
+missing = %i[host].select{ |param| options[param].nil? }
+unless missing.empty?
+  puts "Missing arguments: #{missing.join(', ')}"
+  puts
+  puts optparse
+  exit
+end
+
+RetryException = Class.new(StandardError)
+
+attempt = 1
+
+begin
+  puts
+  puts "Attempt #{attempt}/#{options[:retries]} to check if '#{options[:service]}' on #{options[:host]} is serving"
+  stub = Grpc::Health::V1::Health::Stub.new(options[:host], :this_channel_is_insecure)
+  message = Grpc::Health::V1::HealthCheckRequest.new(service: options[:service])
+
+  response = stub.check(message)
+
+  if response.status == :SERVING
+    puts "Service '#{options[:service]}' on #{options[:host]} is #{response.status}"
+  else
+    raise RetryException
+  end
+rescue GRPC::BadStatus, RetryException => e
+  if e.is_a?(GRPC::BadStatus)
+    message = e.inspect
+  else
+    message = "Service #{options[:service]} on #{options[:host]} is not SERVING (status is #{response&.status})"
+  end
+
+  puts message
+
+  if attempt < options[:retries]
+    attempt += 1
+    puts "Retrying in #{options[:backoff]}s"
+    sleep options[:backoff]
+    retry
+  end
+
+  abort
+end

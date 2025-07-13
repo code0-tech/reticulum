@@ -2,7 +2,7 @@
   extends:
     - .dind
   stage: container:boot
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:171.1-ruby-3.2.2
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:177.1-ruby-3.2.2
 
 .container:boot:sagittarius:
   extends:
@@ -17,6 +17,7 @@
   variables:
     SAGITTARIUS_IMAGE: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${CI_PIPELINE_ID}-${VARIANT}
     CURL_IMAGE: curlimages/curl:8.5.0
+    DOCKER_ARGS: ""
   before_script:
     - docker network create boot
     - >
@@ -33,12 +34,16 @@
     - docker pull $CURL_IMAGE
     - >
       docker run
+      --detach
       --name sagittarius
       --network boot
       --network-alias sagittarius
       --volume $(pwd)/container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+      $DOCKER_ARGS
       $SAGITTARIUS_IMAGE
-      $SAGITTARIUS_CMD &
+      $SAGITTARIUS_CMD
+    - docker ps --all
+    - docker logs -f sagittarius &
 
 container:boot:sagittarius:rails-web:
   extends:
@@ -58,3 +63,17 @@ container:boot:sagittarius:rails-web:
       --retry-delay 3
       --retry-connrefused
       http://sagittarius:3000/health/liveness
+
+container:boot:sagittarius:grpc:
+  extends:
+    - .container:boot:sagittarius
+  variables:
+    SAGITTARIUS_CMD: "bin/grpc_server"
+    DOCKER_ARGS: "--publish 50051:50051 --env SAGITTARIUS_PREPARE_DATABASE=true"
+  before_script:
+    - bundle config set --local force_ruby_platform true
+    - bundle install
+    - !reference [.container:boot:sagittarius, before_script]
+  script:
+    - scripts/grpc_check_health --host docker:50051 --service liveness --retries 20
+    - scripts/grpc_check_health --host docker:50051 --service readiness --retries 20
