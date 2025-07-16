@@ -2,7 +2,7 @@
   extends:
     - .dind
   stage: container:boot
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:171.1-ruby-3.2.2
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:177.1-ruby-3.2.2
 
 .container:boot:sagittarius:
   extends:
