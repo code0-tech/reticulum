@@ -71,7 +71,6 @@ container:boot:sagittarius:grpc:
     SAGITTARIUS_CMD: "bin/grpc_server"
     DOCKER_ARGS: "--publish 50051:50051 --env SAGITTARIUS_PREPARE_DATABASE=true"
   before_script:
-    - bundle config set --local force_ruby_platform true
     - bundle install
     - !reference [.container:boot:sagittarius, before_script]
   script:
