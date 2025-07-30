@@ -3,8 +3,8 @@ function download_project() {
   version=$(cat versions/$project)
   echo "Downloading $project at $version"
   mkdir -p projects
-  curl --output projects/$project.tar.gz -L "https://github.com/code0-tech/$project/archive/$version.tar.gz" || return 1
-  tar -xzf projects/$project.tar.gz -C projects || return 1
+  curl --output projects/$project.tar.gz -L "https://github.com/code0-tech/$project/archive/$version.tar.gz" || return 10
+  tar -xzf projects/$project.tar.gz -C projects || return 10
   rm projects/$project.tar.gz || return 1
   mv projects/$project-* projects/$project || return 1
 }
