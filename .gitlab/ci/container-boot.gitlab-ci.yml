@@ -134,6 +134,7 @@ container:boot:aquila:
       --env NATS_URL=nats://nats:4222
       --env MODE=dynamic
       --env WITH_HEALTH_SERVICE=true
+      --env GRPC_HOST=0.0.0.0
       --env SAGITTARIUS_URL=http://sagittarius:50051
       --publish 8081:8081
       $AQUILA_IMAGE
