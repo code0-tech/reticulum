@@ -77,8 +77,8 @@ container:boot:sagittarius:grpc:
     - bundle install
     - !reference [.container:boot:sagittarius, before_script]
   script:
-    - scripts/grpc_check_health --host docker:50051 --service liveness --retries 20
-    - scripts/grpc_check_health --host docker:50051 --service readiness --retries 20
+    - support/grpc_check_health --host docker:50051 --service liveness --retries 20
+    - support/grpc_check_health --host docker:50051 --service readiness --retries 20
 
 container:boot:aquila:
   extends:
@@ -124,7 +124,7 @@ container:boot:aquila:
       bin/grpc_server
     - docker ps --all
     - docker logs -f sagittarius &
-    - scripts/grpc_check_health --host docker:50051 --service readiness --retries 20
+    - support/grpc_check_health --host docker:50051 --service readiness --retries 20
     - >
       docker run
       --detach
@@ -139,5 +139,5 @@ container:boot:aquila:
       --publish 8081:8081
       $AQUILA_IMAGE
     - docker logs -f aquila &
-    - scripts/grpc_check_health --host docker:8081 --service liveness --retries 20
-    - scripts/grpc_check_health --host docker:8081 --service readiness --retries 20
+    - support/grpc_check_health --host docker:8081 --service liveness --retries 20
+    - support/grpc_check_health --host docker:8081 --service readiness --retries 20

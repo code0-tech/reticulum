@@ -4,7 +4,7 @@
   image: ghcr.io/code0-tech/build-images/reticulum-builder:177.1-ruby-3.2.2
   stage: container
   script:
-    - source scripts/helpers.sh
+    - source support/helpers.sh
     - docker_login
     - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
     - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $image'
