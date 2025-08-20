@@ -3,6 +3,10 @@
     - .dind
   stage: container:boot
   image: ghcr.io/code0-tech/build-images/reticulum-builder:177.1-ruby-3.2.2
+  variables:
+    RETICULUM_IMAGE_BASE: ghcr.io/code0-tech/reticulum/ci-builds
+    SAGITTARIUS_IMAGE: $RETICULUM_IMAGE_BASE/sagittarius:${CI_PIPELINE_ID}-${SAGITTARIUS_VARIANT}
+    AQUILA_IMAGE: $RETICULUM_IMAGE_BASE/aquila:${CI_PIPELINE_ID}
 
 .container:boot:sagittarius:
   extends:
@@ -11,11 +15,10 @@
     - container:sagittarius
   parallel:
     matrix:
-      - VARIANT:
+      - SAGITTARIUS_VARIANT:
           - ce
           - ee
   variables:
-    SAGITTARIUS_IMAGE: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${CI_PIPELINE_ID}-${VARIANT}
     CURL_IMAGE: curlimages/curl:8.5.0
     DOCKER_ARGS: ""
   before_script:
@@ -76,3 +79,65 @@ container:boot:sagittarius:grpc:
   script:
     - scripts/grpc_check_health --host docker:50051 --service liveness --retries 20
     - scripts/grpc_check_health --host docker:50051 --service readiness --retries 20
+
+container:boot:aquila:
+  extends:
+    - .container:boot
+  needs:
+    - container:aquila
+    - container:sagittarius
+  variables:
+    SAGITTARIUS_VARIANT: ce
+  script:
+    - bundle install
+    - docker network create boot
+    - >
+      docker run
+      --detach
+      --name postgres
+      --network boot
+      --network-alias postgres
+      --env POSTGRES_USER=sagittarius
+      --env POSTGRES_PASSWORD=sagittarius
+      --env POSTGRES_DB=sagittarius_production
+      postgres:16.1
+    - >
+      docker run
+      --detach
+      --name nats
+      --network boot
+      --network-alias nats
+      nats:2.11.8
+      -js
+    - docker pull $SAGITTARIUS_IMAGE
+    - docker pull $AQUILA_IMAGE
+    - >
+      docker run
+      --detach
+      --name sagittarius
+      --network boot
+      --network-alias sagittarius
+      --volume $(pwd)/container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+      --env SAGITTARIUS_PREPARE_DATABASE=true
+      --publish 50051:50051
+      $SAGITTARIUS_IMAGE
+      bin/grpc_server
+    - docker ps --all
+    - docker logs -f sagittarius &
+    - scripts/grpc_check_health --host docker:50051 --service readiness --retries 20
+    - >
+      docker run
+      --detach
+      --name aquila
+      --network boot
+      --network-alias aquila
+      --env NATS_URL=nats://nats:4222
+      --env MODE=dynamic
+      --env WITH_HEALTH_SERVICE=true
+      --env GRPC_HOST=0.0.0.0
+      --env SAGITTARIUS_URL=http://sagittarius:50051
+      --publish 8081:8081
+      $AQUILA_IMAGE
+    - docker logs -f aquila &
+    - scripts/grpc_check_health --host docker:8081 --service liveness --retries 20
+    - scripts/grpc_check_health --host docker:8081 --service readiness --retries 20
