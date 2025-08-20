@@ -133,7 +133,8 @@ container:boot:aquila:
       --network-alias aquila
       --env NATS_URL=nats://nats:4222
       --env MODE=dynamic
-      --env BACKEND_URL=http://sagittarius:50051
+      --env WITH_HEALTH_SERVICE=true
+      --env SAGITTARIUS_URL=http://sagittarius:50051
       --publish 8081:8081
       $AQUILA_IMAGE
     - docker logs -f aquila &
