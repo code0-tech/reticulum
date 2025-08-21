@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16.1
+    networks:
+      - boot
+    environment:
+      POSTGRES_USER: sagittarius
+      POSTGRES_PASSWORD: sagittarius
+      POSTGRES_DB: sagittarius_production
+
+  sagittarius-rails-web:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${CI_PIPELINE_ID}-${SAGITTARIUS_VARIANT}
+    networks:
+      - boot
+    volumes:
+      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+
+  curl-sagittarius-rails-web:
+    image: curlimages/curl:8.5.0
+    networks:
+      - boot
+    command:
+      - curl
+      - --fail
+      - -sv
+      - --retry
+      - "20"
+      - --retry-delay
+      - "3"
+      - --retry-connrefused
+      - http://sagittarius-rails-web:3000/health/liveness
+
+  sagittarius-grpc:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${CI_PIPELINE_ID}-${SAGITTARIUS_VARIANT}
+    networks:
+      - boot
+    volumes:
+      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    command:
+      - bin/grpc_server
+    environment:
+      SAGITTARIUS_PREPARE_DATABASE: "true"
+    ports:
+      - "50051:50051"
+
+  nats:
+    image: nats:2.11.8
+    networks:
+      - boot
+    command:
+      - -js
+
+  aquila:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/aquila:${CI_PIPELINE_ID}
+    networks:
+      - boot
+    environment:
+      NATS_URL: nats://nats:4222
+      MODE: dynamic
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      SAGITTARIUS_URL: http://sagittarius-grpc:50051
+    ports:
+      - "8081:8081"
+
+networks:
+  boot:
