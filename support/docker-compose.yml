@@ -63,5 +63,17 @@ services:
     ports:
       - "8081:8081"
 
+  taurus:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/taurus:${CI_PIPELINE_ID}
+    networks:
+      - boot
+    environment:
+      RABBITMQ_URL: nats://nats:4222
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8082"
+    ports:
+      - "8082:8082"
+
 networks:
   boot:
