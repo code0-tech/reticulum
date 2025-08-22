@@ -62,3 +62,16 @@ container:boot:aquila:
     - docker compose logs aquila -f &
     - support/grpc_check_health --host docker:8081 --service liveness --retries 20
     - support/grpc_check_health --host docker:8081 --service readiness --retries 20
+
+container:boot:taurus:
+  extends:
+    - .container:boot
+  needs:
+    - container:taurus
+  script:
+    - bundle install
+    - docker compose up nats -d
+    - docker compose up taurus -d
+    - docker compose logs taurus -f &
+    - support/grpc_check_health --host docker:8082 --service liveness --retries 20
+    - support/grpc_check_health --host docker:8082 --service readiness --retries 20
