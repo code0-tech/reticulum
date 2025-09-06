@@ -75,5 +75,17 @@ services:
     ports:
       - "8082:8082"
 
+  draco:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/draco:${CI_PIPELINE_ID}-${DRACO_VARIANT}
+    networks:
+      - boot
+    environment:
+      NATS_URL: nats://nats:4222
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8083"
+    ports:
+      - "8083:8083"
+
 networks:
   boot:
