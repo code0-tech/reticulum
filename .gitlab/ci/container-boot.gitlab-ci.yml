@@ -75,3 +75,20 @@ container:boot:taurus:
     - docker compose logs taurus -f &
     - support/grpc_check_health --host docker:8082 --service liveness --retries 20
     - support/grpc_check_health --host docker:8082 --service readiness --retries 20
+
+container:boot:draco:
+  extends:
+    - .container:boot
+  needs:
+    - container:draco
+  parallel:
+    matrix:
+      - DRACO_VARIANT:
+          - rest
+  script:
+    - bundle install
+    - docker compose up nats -d
+    - docker compose up draco -d
+    - docker compose logs draco -f &
+    - support/grpc_check_health --host docker:8083 --service liveness --retries 20
+    - support/grpc_check_health --host docker:8083 --service readiness --retries 20
