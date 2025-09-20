@@ -44,7 +44,7 @@ services:
       - "50051:50051"
 
   nats:
-    image: nats:2.11.8
+    image: nats:2.11.9
     networks:
       - boot
     command:
