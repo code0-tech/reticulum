@@ -1,7 +1,7 @@
 .image-build-base:
   extends:
     - .dind
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:177.1-ruby-3.2.2
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:196.1-ruby-3.2.2
   stage: container
   script:
     - source support/helpers.sh
