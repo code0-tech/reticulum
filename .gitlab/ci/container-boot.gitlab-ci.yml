@@ -2,7 +2,7 @@
   extends:
     - .dind
   stage: container:boot
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:196.1-ruby-3.2.2
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:203.1-ruby-3.2.2
   variables:
     COMPOSE_FILE: support/docker-compose.yml
 
