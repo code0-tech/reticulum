@@ -1,6 +1,7 @@
 .image-build-base:
   extends:
     - .dind
+    - .default-retry
   image: ghcr.io/code0-tech/build-images/reticulum-builder:207.1-ruby-3.2.2
   stage: container
   variables:

@@ -1,6 +1,7 @@
 .container:boot:
   extends:
     - .dind
+    - .default-retry
   stage: container:boot
   image: ghcr.io/code0-tech/build-images/reticulum-builder:207.1-ruby-3.2.2
   variables:

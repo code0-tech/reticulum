@@ -2,7 +2,7 @@ stages:
   - container
   - container:boot
 
-default:
+.default-retry:
   retry:
     max: 2
     when:
