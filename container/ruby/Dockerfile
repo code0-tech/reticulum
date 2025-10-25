@@ -5,5 +5,5 @@ FROM ghcr.io/code0-tech/reticulum/ci-builds/mise:$RETICULUM_IMAGE_TAG
 ARG RUBY_VERSION=3.2.2
 
 RUN apk add --update --no-cache build-base tzdata zlib-dev perl linux-headers libffi readline yaml-dev
-RUN mise install-into ruby@$RUBY_VERSION /usr/local/share/ruby
+RUN mise install-into ruby@$RUBY_VERSION /usr/local/share/ruby || exit_code=$?; cat /tmp/ruby-build.*.log || exit ${exit_code:-0}
 ENV PATH=/usr/local/share/ruby/bin:$PATH
