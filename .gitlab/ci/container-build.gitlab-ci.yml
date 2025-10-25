@@ -1,11 +1,15 @@
 .image-build-base:
   extends:
     - .dind
+    - .default-retry
   image: ghcr.io/code0-tech/build-images/reticulum-builder:207.1-ruby-3.2.2
   stage: container
+  variables:
+    PLATFORM_ARGS: "--platform linux/amd64,linux/arm64"
   script:
     - source support/helpers.sh
     - docker_login
+    - docker_setup_multi_arch
     - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
     - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $image'
   retry:
@@ -17,18 +21,14 @@
     - .image-build-base
   script:
     - !reference [.image-build-base, script]
-    - build_image $image $CI_PIPELINE_ID
-    - push_image $image $CI_PIPELINE_ID
+    - build_image $image $CI_PIPELINE_ID "--push"
 
 .variant-image-build-base:
   extends:
     - .image-build-base
   script:
     - !reference [.image-build-base, script]
-    - build_image $image $CI_PIPELINE_ID "--build-arg VARIANT=$VARIANT"
-    - image_tag=$(get_image_tag $CI_PIPELINE_ID $VARIANT)
-    - retag_image $image $CI_PIPELINE_ID $image_tag
-    - push_image $image $image_tag
+    - build_image $image $CI_PIPELINE_ID "--build-arg VARIANT=$VARIANT --push" $(get_image_tag $CI_PIPELINE_ID $VARIANT)
 
 container:mise:
   extends:
