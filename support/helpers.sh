@@ -13,10 +13,22 @@ function docker_login() {
   echo $C0_GH_TOKEN | docker login -u $ --password-stdin ghcr.io
 }
 
+function docker_setup_multi_arch() {
+  docker context create build-context
+  docker buildx create \
+    --name container-builder \
+    --driver docker-container \
+    --bootstrap \
+    --use \
+    build-context
+  docker run --privileged --rm tonistiigi/binfmt --install all
+}
+
 function build_image() {
   image=$1
   reticulum_tag=$2
   build_args=$3
+  reticulum_push_tag=${4:-$reticulum_tag}
 
   echo "Building image for $image"
 
@@ -25,25 +37,13 @@ function build_image() {
     container/$image/renderDockerfile
   fi
 
-  docker build \
-    -t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" \
+  docker buildx build \
+    -t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_push_tag" \
     -f "container/$image/Dockerfile" \
     --build-arg RETICULUM_IMAGE_TAG=$reticulum_tag \
     $build_args \
+    $PLATFORM_ARGS \
     .
-}
-
-function push_image() {
-  image=$1
-  reticulum_tag=$2
-  docker push "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag"
-}
-
-function retag_image() {
-  image=$1
-  reticulum_tag=$2
-  variant_tag=$3
-  docker image tag "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" "ghcr.io/code0-tech/reticulum/ci-builds/$image:$variant_tag"
 }
 
 function get_image_tag() {
