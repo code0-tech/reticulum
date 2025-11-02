@@ -6,4 +6,4 @@ gem "erb"
 
 gem "grpc", "~> 1.73"
 
-gem "optparse", "~> 0.6.0"
+gem "optparse", "~> 0.8.0"
