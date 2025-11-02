@@ -1,21 +1,32 @@
 .container:boot:
   extends:
     - .dind
+    - .default-retry
+  tags:
+    - c0-$PLATFORM
   stage: container:boot
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:207.1-ruby-3.2.2
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:227.1-ruby-3.4.7-$PLATFORM
   variables:
     COMPOSE_FILE: support/docker-compose.yml
+  parallel:
+    matrix:
+      - PLATFORM:
+          - amd64
+          - arm64
 
 .container:boot:sagittarius:
   extends:
     - .container:boot
   needs:
-    - container:sagittarius
+    - manifest:sagittarius
   parallel:
     matrix:
       - SAGITTARIUS_VARIANT:
           - ce
           - ee
+        PLATFORM:
+          - amd64
+          - arm64
   before_script:
     - docker compose up postgres -d
     - docker compose up sagittarius-$SAGITTARIUS_SERVICE -d
@@ -46,8 +57,8 @@ container:boot:aquila:
   extends:
     - .container:boot
   needs:
-    - container:aquila
-    - container:sagittarius
+    - manifest:aquila
+    - manifest:sagittarius
   variables:
     SAGITTARIUS_VARIANT: ce
   script:
@@ -67,7 +78,7 @@ container:boot:taurus:
   extends:
     - .container:boot
   needs:
-    - container:taurus
+    - manifest:taurus
   script:
     - bundle install
     - docker compose up nats -d
@@ -80,11 +91,14 @@ container:boot:draco:
   extends:
     - .container:boot
   needs:
-    - container:draco
+    - manifest:draco
   parallel:
     matrix:
       - DRACO_VARIANT:
           - rest
+        PLATFORM:
+          - amd64
+          - arm64
   script:
     - bundle install
     - docker compose up nats -d

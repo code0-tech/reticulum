@@ -1,11 +1,15 @@
 .image-build-base:
   extends:
     - .dind
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:207.1-ruby-3.2.2
+    - .default-retry
+  tags:
+    - c0-$PLATFORM
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:227.1-ruby-3.4.7-$PLATFORM
   stage: container
-  script:
+  before_script:
     - source support/helpers.sh
     - docker_login
+    - docker_setup_builder
     - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
     - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $image'
   retry:
@@ -15,77 +19,157 @@
 .single-image-build-base:
   extends:
     - .image-build-base
+  parallel:
+    matrix:
+      - PLATFORM:
+          - amd64
+          - arm64
   script:
-    - !reference [.image-build-base, script]
-    - build_image $image $CI_PIPELINE_ID
-    - push_image $image $CI_PIPELINE_ID
+    - >
+      build_image
+      $image
+      $CI_PIPELINE_ID
+      "--output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      ""
+  artifacts:
+    paths:
+      - manifest-*.json
+    expire_in: 1 day
 
 .variant-image-build-base:
   extends:
     - .image-build-base
   script:
-    - !reference [.image-build-base, script]
-    - build_image $image $CI_PIPELINE_ID "--build-arg VARIANT=$VARIANT"
-    - image_tag=$(get_image_tag $CI_PIPELINE_ID $VARIANT)
-    - retag_image $image $CI_PIPELINE_ID $image_tag
-    - push_image $image $image_tag
+    - >
+      build_image 
+      $image
+      $CI_PIPELINE_ID 
+      "--build-arg VARIANT=$VARIANT --output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      ""
+  artifacts:
+    paths:
+      - manifest-*.json
+    expire_in: 1 day
+
+.manifest-create-base:
+  extends:
+    - .image-build-base
+  variables:
+    PLATFORM: amd64
+  script:
+    - create_manifest $image $(get_image_tag $CI_PIPELINE_ID $VARIANT)
 
 container:mise:
   extends:
     - .single-image-build-base
 
+manifest:mise:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:mise
+
 container:rust:
   extends:
     - .single-image-build-base
   needs:
-    - container:mise
+    - manifest:mise
+
+manifest:rust:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:rust
 
 container:aquila:
   extends:
     - .single-image-build-base
   needs:
-    - container:rust
+    - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+
+manifest:aquila:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:aquila
 
 container:draco:
   extends:
     - .variant-image-build-base
   needs:
-    - container:rust
+    - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
   parallel:
     matrix:
       - VARIANT:
           - rest
+        PLATFORM:
+          - amd64
+          - arm64
+
+manifest:draco:
+  extends:
+    - .manifest-create-base
+  parallel:
+    matrix:
+      - VARIANT:
+          - rest
+  needs:
+    - job: container:draco
+      parallel:
+        matrix:
+          - VARIANT: ['$[[ matrix.VARIANT ]]']
+            PLATFORM:
+              - amd64
+              - arm64
 
 container:taurus:
   extends:
     - .single-image-build-base
   needs:
-    - container:rust
+    - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+
+manifest:taurus:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:taurus
 
 container:ruby:
   extends:
     - .single-image-build-base
   needs:
-    - container:mise
+    - manifest:mise
+
+manifest:ruby:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:ruby
 
 container:postgresql:
   extends:
     - .single-image-build-base
   needs:
-    - container:mise
+    - manifest:mise
+
+manifest:postgresql:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:postgresql
 
 container:sagittarius:
   extends:
     - .variant-image-build-base
   needs:
-    - container:ruby
-    - container:postgresql
+    - manifest:ruby
+    - manifest:postgresql
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
   parallel:
@@ -93,3 +177,23 @@ container:sagittarius:
       - VARIANT:
           - ce
           - ee
+        PLATFORM:
+          - amd64
+          - arm64
+
+manifest:sagittarius:
+  extends:
+    - .manifest-create-base
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+  needs:
+    - job: container:sagittarius
+      parallel:
+        matrix:
+          - VARIANT: [ '$[[ matrix.VARIANT ]]' ]
+            PLATFORM:
+              - amd64
+              - arm64
