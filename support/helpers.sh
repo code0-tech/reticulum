@@ -13,10 +13,21 @@ function docker_login() {
   echo $C0_GH_TOKEN | docker login -u $ --password-stdin ghcr.io
 }
 
+function docker_setup_builder() {
+  docker context create build-context
+  docker buildx create \
+    --name container-builder \
+    --driver docker-container \
+    --bootstrap \
+    --use \
+    build-context
+}
+
 function build_image() {
   image=$1
   reticulum_tag=$2
   build_args=$3
+  reticulum_push_tag=${4-":$reticulum_tag"}
 
   echo "Building image for $image"
 
@@ -25,25 +36,24 @@ function build_image() {
     container/$image/renderDockerfile
   fi
 
-  docker build \
-    -t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" \
+  docker buildx build \
+    -t "ghcr.io/code0-tech/reticulum/ci-builds/$image$reticulum_push_tag" \
     -f "container/$image/Dockerfile" \
     --build-arg RETICULUM_IMAGE_TAG=$reticulum_tag \
     $build_args \
     .
 }
 
-function push_image() {
+function create_manifest() {
   image=$1
   reticulum_tag=$2
-  docker push "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag"
-}
 
-function retag_image() {
-  image=$1
-  reticulum_tag=$2
-  variant_tag=$3
-  docker image tag "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag" "ghcr.io/code0-tech/reticulum/ci-builds/$image:$variant_tag"
+  args=(-t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag")
+  for manifest in manifest-*.json; do
+      args+=("$(jq -r '."image.name"' $manifest)@$(jq -r '."containerimage.digest"' $manifest)")
+  done
+
+  docker buildx imagetools create "${args[@]}"
 }
 
 function get_image_tag() {
