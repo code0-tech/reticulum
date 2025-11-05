@@ -16,7 +16,7 @@ services:
       - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
 
   curl-sagittarius-rails-web:
-    image: curlimages/curl:8.16.0
+    image: curlimages/curl:8.17.0
     networks:
       - boot
     command:
