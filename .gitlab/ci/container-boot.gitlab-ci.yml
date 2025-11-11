@@ -106,3 +106,23 @@ container:boot:draco:
     - docker compose logs draco -f &
     - support/grpc_check_health --host docker:8083 --service liveness --retries 20
     - support/grpc_check_health --host docker:8083 --service readiness --retries 20
+
+container:boot:sculptor:
+  extends:
+    - .container:boot
+  needs:
+    - manifest:sculptor
+  parallel:
+    matrix:
+      - SCULPTOR_VARIANT:
+          - ce
+          - ee
+          - cloud
+        PLATFORM:
+          - amd64
+          - arm64
+  script:
+    - docker compose up sculptor -d
+    - docker ps --all
+    - docker compose logs sculptor -f &
+    - docker compose run curl-sculptor
