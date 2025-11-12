@@ -93,7 +93,7 @@ services:
       - boot
 
   curl-sculptor:
-    image: curlimages/curl:8.16.0
+    image: curlimages/curl:8.17.0
     networks:
       - boot
     command:
