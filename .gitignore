@@ -3,6 +3,7 @@
 
 # generated dockerfiles
 container/sagittarius/Dockerfile
+container/sculptor/Dockerfile
 
 # downloaded projects
 projects

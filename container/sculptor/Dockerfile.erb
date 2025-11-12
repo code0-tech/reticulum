@@ -1,0 +1,31 @@
+ARG RETICULUM_IMAGE_TAG=local
+
+FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG
+
+WORKDIR /sculptor
+
+COPY projects/sculptor/edition.mjs \
+     projects/sculptor/next.config.ts \
+     projects/sculptor/package-lock.json \
+     projects/sculptor/package.json \
+     projects/sculptor/tsconfig.json \
+     .
+
+RUN npm ci
+
+COPY projects/sculptor/src/app src/app
+COPY projects/sculptor/src/packages/ce src/packages/ce
+
+<% if ee? || cloud? %>
+COPY projects/sculptor/src/packages/ee src/packages/ee
+<% end %>
+
+<% if cloud? %>
+COPY projects/sculptor/src/packages/cloud src/packages/cloud
+<% end %>
+
+ENV EDITION=<%= variant %>
+
+RUN npm run build
+
+ENTRYPOINT ["npm", "run", "start"]

@@ -87,5 +87,25 @@ services:
     ports:
       - "8083:8083"
 
+  sculptor:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sculptor:${CI_PIPELINE_ID}-${SCULPTOR_VARIANT}
+    networks:
+      - boot
+
+  curl-sculptor:
+    image: curlimages/curl:8.16.0
+    networks:
+      - boot
+    command:
+      - curl
+      - --fail
+      - -sv
+      - --retry
+      - "20"
+      - --retry-delay
+      - "3"
+      - --retry-connrefused
+      - http://sculptor:3000/
+
 networks:
   boot:

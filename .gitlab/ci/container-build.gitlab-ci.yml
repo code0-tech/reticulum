@@ -197,3 +197,50 @@ manifest:sagittarius:
             PLATFORM:
               - amd64
               - arm64
+
+container:node:
+  extends:
+    - .single-image-build-base
+  needs:
+    - manifest:mise
+
+manifest:node:
+  extends:
+    - .manifest-create-base
+  needs:
+    - container:node
+
+container:sculptor:
+  extends:
+    - .variant-image-build-base
+  needs:
+    - manifest:node
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+          - cloud
+        PLATFORM:
+          - amd64
+          - arm64
+
+manifest:sculptor:
+  extends:
+    - .manifest-create-base
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+          - cloud
+  needs:
+    - job: container:sculptor
+      parallel:
+        matrix:
+          - VARIANT: [ '$[[ matrix.VARIANT ]]' ]
+            PLATFORM:
+              - amd64
+              - arm64
