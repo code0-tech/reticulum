@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     bigdecimal (3.2.3)
-    erb (5.1.3)
+    erb (6.0.0)
     google-protobuf (4.32.1)
       bigdecimal
       rake (>= 13)
