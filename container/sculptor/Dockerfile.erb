@@ -5,6 +5,7 @@ FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG
 WORKDIR /sculptor
 
 COPY projects/sculptor/edition.mjs \
+     projects/sculptor/graphql-imports.d.ts \
      projects/sculptor/next.config.ts \
      projects/sculptor/package-lock.json \
      projects/sculptor/package.json \
@@ -15,6 +16,7 @@ RUN npm ci
 
 COPY projects/sculptor/src/app src/app
 COPY projects/sculptor/src/packages/ce src/packages/ce
+COPY projects/sculptor/src/packages/core src/packages/core
 
 <% if ee? || cloud? %>
 COPY projects/sculptor/src/packages/ee src/packages/ee
