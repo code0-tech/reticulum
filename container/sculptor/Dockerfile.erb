@@ -14,6 +14,7 @@ COPY projects/sculptor/edition.mjs \
 
 RUN npm ci
 
+COPY projects/sculptor/src/hooks src/hooks
 COPY projects/sculptor/src/app src/app
 COPY projects/sculptor/src/packages/ce src/packages/ce
 COPY projects/sculptor/src/packages/core src/packages/core
