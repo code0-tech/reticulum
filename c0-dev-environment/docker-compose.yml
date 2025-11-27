@@ -1,0 +1,109 @@
+services:
+  postgres:
+    image: postgres:16.1
+    networks:
+      - boot
+    environment:
+      POSTGRES_USER: sagittarius
+      POSTGRES_PASSWORD: sagittarius
+      POSTGRES_DB: sagittarius_production
+
+  sagittarius-rails-web:
+    depends_on:
+      - postgres
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2183733560-ee
+    networks:
+      - boot
+    volumes:
+      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    ports:
+      - "3000:3000"
+
+
+  sagittarius-grpc:
+    depends_on:
+      - postgres
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2183733560-ee
+    networks:
+      - boot
+    volumes:
+      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    command:
+      - bin/grpc_server
+    environment:
+      SAGITTARIUS_PREPARE_DATABASE: "true"
+    ports:
+      - "50051:50051"
+
+  nats:
+    image: nats:2.11.9
+    networks:
+      - boot
+    command:
+      - -js
+    ports:
+      - "4222:4222"
+
+  aquila:
+    depends_on:
+      - nats
+      - sagittarius-grpc
+    image: ghcr.io/code0-tech/reticulum/ci-builds/aquila:2174573653
+    networks:
+      - boot
+    environment:
+      MODE: dynamic
+      NATS_URL: nats://nats:4222
+      NATS_BUCKET: 'flow_store'
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      SAGITTARIUS_URL: http://sagittarius-grpc:50051
+    ports:
+      - "8081:8081"
+
+  taurus:
+    depends_on:
+      - nats
+    image: ghcr.io/code0-tech/reticulum/ci-builds/taurus:2174573653
+    networks:
+      - boot
+    environment:
+      MODE: dynamic
+      AQUILA_URL: 'http://aquila:8081'
+      NATS_URL: nats://nats:4222
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8082"
+      DEFINITION_PATH: '/definitions'
+    ports:
+      - "8082:8082"
+
+  draco:
+    depends_on:
+      - nats
+    image: ghcr.io/code0-tech/reticulum/ci-builds/draco:2174573653-rest
+    networks:
+      - boot
+    environment:
+      MODE: dynamic
+      AQUILA_URL: 'http://host.docker.internal:8081'
+      NATS_URL: nats://nats:4222
+      NATS_BUCKET: 'flow_store'
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8083"
+      DEFINITION_PATH: '/definitions'
+    ports:
+      - "8083:8083"
+
+  sculptor:
+    depends_on:
+      - sagittarius-rails-web
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sculptor:2174573653-ee
+    networks:
+      - boot
+    ports:
+      - "3000:3000"
+
+networks:
+  boot:
