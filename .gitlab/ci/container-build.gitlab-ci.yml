@@ -29,7 +29,8 @@
       build_image
       $image
       $CI_PIPELINE_ID
-      "--output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      "--output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json
+      --cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache "
       ""
   artifacts:
     paths:
