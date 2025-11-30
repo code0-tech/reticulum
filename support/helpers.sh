@@ -40,7 +40,6 @@ function build_image() {
     -t "ghcr.io/code0-tech/reticulum/ci-builds/$image$reticulum_push_tag" \
     -f "container/$image/Dockerfile" \
     --build-arg RETICULUM_IMAGE_TAG=$reticulum_tag \
-    --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache \
     $build_args \
     .
 }
