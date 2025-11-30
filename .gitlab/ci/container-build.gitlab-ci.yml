@@ -49,7 +49,13 @@
       build_image 
       $image
       $CI_PIPELINE_ID 
-      "--build-arg VARIANT=$VARIANT --output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      "
+        --build-arg VARIANT=$VARIANT
+        --output type=registry,push-by-digest=true
+        --metadata-file manifest-${CI_JOB_ID}.json
+        --cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}
+        --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}
+      "
       ""
   artifacts:
     paths:
