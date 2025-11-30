@@ -46,6 +46,7 @@ COPY projects/sagittarius/extensions/ee/app/ extensions/ee/app/
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/ <% if ee? %>extensions/ee/app/<% end %>
 
+ARG RETICULUM_IMAGE_TAG=local
 RUN echo "$RETICULUM_IMAGE_TAG" > VERSION
 
 # Entrypoint prepares the database.

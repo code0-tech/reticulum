@@ -25,11 +25,21 @@
           - amd64
           - arm64
   script:
+    - CACHE_TO=""
+    - |
+      if [ "$C0_GH_REF_NAME" = "main" ]; then
+        CACHE_TO="--cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${PLATFORM}"
+      fi
     - >
       build_image
       $image
       $CI_PIPELINE_ID
-      "--output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      "
+        --output type=registry,push-by-digest=true 
+        --metadata-file manifest-${CI_JOB_ID}.json
+        --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${PLATFORM}
+        $CACHE_TO
+      "
       ""
   artifacts:
     paths:
@@ -40,11 +50,22 @@
   extends:
     - .image-build-base
   script:
+    - CACHE_TO=""
+    - |
+      if [ "$C0_GH_REF_NAME" = "main" ]; then
+        CACHE_TO="--cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}"
+      fi
     - >
       build_image 
       $image
       $CI_PIPELINE_ID 
-      "--build-arg VARIANT=$VARIANT --output type=registry,push-by-digest=true --metadata-file manifest-${CI_JOB_ID}.json"
+      "
+        --build-arg VARIANT=$VARIANT
+        --output type=registry,push-by-digest=true
+        --metadata-file manifest-${CI_JOB_ID}.json
+        --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}
+        $CACHE_TO
+      "
       ""
   artifacts:
     paths:
