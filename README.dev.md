@@ -192,21 +192,28 @@ Edit `.env` to change ports, credentials, or other settings.
 
 ### Service Image Tags
 
-All service images are configurable via environment variables. By default, they use the `latest` tag, but you can specify different versions:
+All service images use CI pipeline builds from `ghcr.io/code0-tech/reticulum/ci-builds/`. You **must** specify image tags as pipeline IDs in your `.env` file:
 
 ```bash
 # In your .env file
-SAGITTARIUS_TAG=v1.2.3
-AQUILA_TAG=v2.0.1
-TAURUS_TAG=main
-DRACO_TAG=dev
-SCULPTOR_TAG=v1.0.0
+# Tags are pipeline IDs from CI builds
+SAGITTARIUS_TAG=12345-ruby    # Format: PIPELINE_ID-VARIANT
+AQUILA_TAG=12345              # Format: PIPELINE_ID
+TAURUS_TAG=12345              # Format: PIPELINE_ID
+DRACO_TAG=12345-go            # Format: PIPELINE_ID-VARIANT
+SCULPTOR_TAG=12345-node       # Format: PIPELINE_ID-VARIANT
 ```
 
+**Important Notes:**
+- Image tags are **required** - there are no default values
+- Tags are CI pipeline IDs, not git tags or version numbers
+- Some services require a variant suffix (e.g., `-ruby`, `-go`, `-node`)
+- All images come from the `ci-builds` repository path
+
 This allows you to:
-- Test specific versions of services
-- Use development branches for services you're working on
-- Pin versions for stability
+- Test specific CI pipeline builds
+- Use consistent versions across all services
+- Ensure reproducible development environments
 
 **Security Note:** The default configuration uses weak passwords that are suitable for local development only. If you're running services in any environment that is accessible from outside your local machine, make sure to:
 - Change all default passwords in your `.env` file
