@@ -89,6 +89,11 @@ docker compose -f docker-compose.dev.yml --profile taurus up
 docker compose -f docker-compose.dev.yml --profile draco up
 ```
 
+**Runtime Services (Aquila + Taurus + Draco):**
+```bash
+docker compose -f docker-compose.dev.yml --profile runtime up
+```
+
 **Sculptor:**
 ```bash
 docker compose -f docker-compose.dev.yml --profile sculptor up
@@ -104,6 +109,7 @@ docker compose -f docker-compose.dev.yml --profile sculptor up
 | `sagittarius` | sagittarius-rails-web, sagittarius-grpc, postgres | postgres | Both Sagittarius services with database |
 | `sagittarius-web` | sagittarius-rails-web, postgres | postgres | Sagittarius web interface with database |
 | `sagittarius-grpc` | sagittarius-grpc, postgres | postgres | Sagittarius gRPC server with database |
+| `runtime` | aquila, taurus, draco, nats | nats | All runtime services (Aquila, Taurus, Draco) with NATS |
 | `aquila` | aquila, nats | nats | Aquila service with NATS |
 | `taurus` | taurus, nats | nats | Taurus service with NATS |
 | `draco` | draco, nats | nats | Draco service with NATS |
@@ -183,6 +189,24 @@ cp .env.example .env
 ```
 
 Edit `.env` to change ports, credentials, or other settings.
+
+### Service Image Tags
+
+All service images are configurable via environment variables. By default, they use the `latest` tag, but you can specify different versions:
+
+```bash
+# In your .env file
+SAGITTARIUS_TAG=v1.2.3
+AQUILA_TAG=v2.0.1
+TAURUS_TAG=main
+DRACO_TAG=dev
+SCULPTOR_TAG=v1.0.0
+```
+
+This allows you to:
+- Test specific versions of services
+- Use development branches for services you're working on
+- Pin versions for stability
 
 **Security Note:** The default configuration uses weak passwords that are suitable for local development only. If you're running services in any environment that is accessible from outside your local machine, make sure to:
 - Change all default passwords in your `.env` file

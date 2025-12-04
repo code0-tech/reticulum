@@ -28,6 +28,7 @@ Available Profiles:
     sagittarius           Both Sagittarius services (includes postgres)
     sagittarius-web       Sagittarius web (includes postgres)
     sagittarius-grpc      Sagittarius gRPC (includes postgres)
+    runtime               All runtime services: Aquila, Taurus, Draco (includes nats)
     aquila                Aquila service (includes nats)
     taurus                Taurus service (includes nats)
     draco                 Draco service (includes nats)
@@ -36,6 +37,7 @@ Available Profiles:
 Examples:
     $0 start all          # Start all services
     $0 start database     # Start only database
+    $0 start runtime      # Start Aquila, Taurus, and Draco with NATS
     $0 start aquila       # Start Aquila with NATS
     $0 logs sagittarius-rails-web
     $0 ps

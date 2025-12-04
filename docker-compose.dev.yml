@@ -32,6 +32,7 @@ services:
       - aquila
       - taurus
       - draco
+      - runtime
       - all
     command:
       - -js
@@ -48,7 +49,7 @@ services:
 
   # Sagittarius Rails Web Service
   sagittarius-rails-web:
-    image: ghcr.io/code0-tech/sagittarius:latest
+    image: ghcr.io/code0-tech/sagittarius:${SAGITTARIUS_TAG:-latest}
     profiles:
       - sagittarius-web
       - sagittarius
@@ -77,7 +78,7 @@ services:
 
   # Sagittarius gRPC Service
   sagittarius-grpc:
-    image: ghcr.io/code0-tech/sagittarius:latest
+    image: ghcr.io/code0-tech/sagittarius:${SAGITTARIUS_TAG:-latest}
     profiles:
       - sagittarius-grpc
       - sagittarius
@@ -109,9 +110,10 @@ services:
 
   # Aquila Service
   aquila:
-    image: ghcr.io/code0-tech/aquila:latest
+    image: ghcr.io/code0-tech/aquila:${AQUILA_TAG:-latest}
     profiles:
       - aquila
+      - runtime
       - all
     ports:
       - "${AQUILA_PORT:-8081}:8081"
@@ -137,9 +139,10 @@ services:
 
   # Taurus Service
   taurus:
-    image: ghcr.io/code0-tech/taurus:latest
+    image: ghcr.io/code0-tech/taurus:${TAURUS_TAG:-latest}
     profiles:
       - taurus
+      - runtime
       - all
     ports:
       - "${TAURUS_PORT:-8082}:8082"
@@ -162,9 +165,10 @@ services:
 
   # Draco Service
   draco:
-    image: ghcr.io/code0-tech/draco:latest
+    image: ghcr.io/code0-tech/draco:${DRACO_TAG:-latest}
     profiles:
       - draco
+      - runtime
       - all
     ports:
       - "${DRACO_PORT:-8083}:8083"
@@ -187,7 +191,7 @@ services:
 
   # Sculptor Service
   sculptor:
-    image: ghcr.io/code0-tech/sculptor:latest
+    image: ghcr.io/code0-tech/sculptor:${SCULPTOR_TAG:-latest}
     profiles:
       - sculptor
       - all
