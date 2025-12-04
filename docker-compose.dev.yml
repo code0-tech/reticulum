@@ -9,17 +9,17 @@ services:
       - sagittarius
       - all
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: sagittarius
-      POSTGRES_PASSWORD: sagittarius
-      POSTGRES_DB: sagittarius_development
+      POSTGRES_USER: ${POSTGRES_USER:-sagittarius}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sagittarius}
+      POSTGRES_DB: ${POSTGRES_DB:-sagittarius_development}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - reticulum_dev
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sagittarius"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-sagittarius}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,12 +56,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      RAILS_ENV: development
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: sagittarius
-      POSTGRES_PASSWORD: sagittarius
-      POSTGRES_DB: sagittarius_development
+      RAILS_ENV: ${RAILS_ENV:-development}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER:-sagittarius}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sagittarius}
+      POSTGRES_DB: ${POSTGRES_DB:-sagittarius_development}
     volumes:
       - ./container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
     networks:
@@ -85,12 +85,12 @@ services:
     ports:
       - "50051:50051"
     environment:
-      RAILS_ENV: development
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: sagittarius
-      POSTGRES_PASSWORD: sagittarius
-      POSTGRES_DB: sagittarius_development
+      RAILS_ENV: ${RAILS_ENV:-development}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER:-sagittarius}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sagittarius}
+      POSTGRES_DB: ${POSTGRES_DB:-sagittarius_development}
       SAGITTARIUS_PREPARE_DATABASE: "true"
     volumes:
       - ./container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
@@ -116,14 +116,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      NATS_URL: nats://nats:4222
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
       MODE: dynamic
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8081"
       SAGITTARIUS_URL: http://sagittarius-grpc:50051
-      RUNTIME_TOKEN: dev_runtime_token
-      RUST_LOG: info
+      RUNTIME_TOKEN: ${AQUILA_RUNTIME_TOKEN:-dev_runtime_token}
+      RUST_LOG: ${RUST_LOG:-info}
     networks:
       - reticulum_dev
     depends_on:
@@ -144,11 +144,11 @@ services:
     ports:
       - "8082:8082"
     environment:
-      NATS_URL: nats://nats:4222
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8082"
-      RUST_LOG: info
+      RUST_LOG: ${RUST_LOG:-info}
     networks:
       - reticulum_dev
     depends_on:
@@ -169,7 +169,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      NATS_URL: nats://nats:4222
+      NATS_URL: ${NATS_URL:-nats://nats:4222}
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8083"
