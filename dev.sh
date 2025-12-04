@@ -46,11 +46,40 @@ Examples:
 EOF
 }
 
+check_required_env() {
+    local missing_vars=()
+    
+    # Check for required image tag variables
+    [ -z "$SAGITTARIUS_TAG" ] && missing_vars+=("SAGITTARIUS_TAG")
+    [ -z "$AQUILA_TAG" ] && missing_vars+=("AQUILA_TAG")
+    [ -z "$TAURUS_TAG" ] && missing_vars+=("TAURUS_TAG")
+    [ -z "$DRACO_TAG" ] && missing_vars+=("DRACO_TAG")
+    [ -z "$SCULPTOR_TAG" ] && missing_vars+=("SCULPTOR_TAG")
+    
+    if [ ${#missing_vars[@]} -gt 0 ]; then
+        echo "Error: Required environment variables are not set:"
+        for var in "${missing_vars[@]}"; do
+            echo "  - $var"
+        done
+        echo ""
+        echo "Please create a .env file with the required variables:"
+        echo "  cp .env.example .env"
+        echo "  # Edit .env to set pipeline IDs for image tags"
+        echo ""
+        return 1
+    fi
+    return 0
+}
+
 case "${1:-}" in
     start)
         if [ -z "$2" ]; then
             echo "Error: Profile required"
             show_help
+            exit 1
+        fi
+        # Check for required environment variables
+        if ! check_required_env; then
             exit 1
         fi
         echo "Starting services with profile: $2"
@@ -67,6 +96,10 @@ case "${1:-}" in
         if [ -z "$2" ]; then
             echo "Error: Profile required"
             show_help
+            exit 1
+        fi
+        # Check for required environment variables
+        if ! check_required_env; then
             exit 1
         fi
         echo "Restarting services with profile: $2"

@@ -258,9 +258,22 @@ docker compose -f docker-compose.dev.yml ps
 - Services include health checks for better dependency management
 - The postgres data is persisted in a Docker volume named `postgres_data`
 - All services are connected via the `reticulum_dev` network
-- Services use `latest` image tags by default (can be overridden in `.env`)
+- Service images require pipeline ID tags to be specified in `.env` file (no defaults)
 
 ## Troubleshooting
+
+### Missing environment variables
+If you see an error about missing required environment variables:
+```
+Error: Required environment variables are not set:
+  - SAGITTARIUS_TAG
+  ...
+```
+Create and configure your `.env` file:
+```bash
+cp .env.example .env
+# Edit .env to set pipeline IDs for all image tags
+```
 
 ### Services won't start
 - Check if ports are already in use: `netstat -tuln | grep <port>`
@@ -273,3 +286,4 @@ docker compose -f docker-compose.dev.yml ps
 ### Image pull issues
 - Ensure you have access to the ghcr.io registry
 - Login if needed: `docker login ghcr.io`
+- Verify your pipeline IDs are correct in `.env`
