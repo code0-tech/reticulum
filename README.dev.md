@@ -184,6 +184,12 @@ cp .env.example .env
 
 Edit `.env` to change ports, credentials, or other settings.
 
+**Security Note:** The default configuration uses weak passwords that are suitable for local development only. If you're running services in any environment that is accessible from outside your local machine, make sure to:
+- Change all default passwords in your `.env` file
+- Use strong, unique passwords for database credentials
+- Change the default runtime tokens
+- Consider using secrets management for sensitive configuration
+
 ## Useful Commands
 
 ### Start services in detached mode

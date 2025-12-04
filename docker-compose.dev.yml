@@ -121,7 +121,7 @@ services:
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8081"
-      SAGITTARIUS_URL: http://sagittarius-grpc:50051
+      SAGITTARIUS_URL: ${SAGITTARIUS_URL:-http://sagittarius-grpc:50051}
       RUNTIME_TOKEN: ${AQUILA_RUNTIME_TOKEN:-dev_runtime_token}
       RUST_LOG: ${RUST_LOG:-info}
     networks:
