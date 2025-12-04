@@ -36,8 +36,8 @@ services:
     command:
       - -js
     ports:
-      - "4222:4222"
-      - "8222:8222"
+      - "${NATS_PORT:-4222}:4222"
+      - "${NATS_HTTP_PORT:-8222}:8222"
     networks:
       - reticulum_dev
     healthcheck:
@@ -54,7 +54,7 @@ services:
       - sagittarius
       - all
     ports:
-      - "3000:3000"
+      - "${SAGITTARIUS_WEB_PORT:-3000}:3000"
     environment:
       RAILS_ENV: ${RAILS_ENV:-development}
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
@@ -83,7 +83,7 @@ services:
       - sagittarius
       - all
     ports:
-      - "50051:50051"
+      - "${SAGITTARIUS_GRPC_PORT:-50051}:50051"
     environment:
       RAILS_ENV: ${RAILS_ENV:-development}
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
@@ -114,7 +114,7 @@ services:
       - aquila
       - all
     ports:
-      - "8081:8081"
+      - "${AQUILA_PORT:-8081}:8081"
     environment:
       NATS_URL: ${NATS_URL:-nats://nats:4222}
       MODE: dynamic
@@ -142,7 +142,7 @@ services:
       - taurus
       - all
     ports:
-      - "8082:8082"
+      - "${TAURUS_PORT:-8082}:8082"
     environment:
       NATS_URL: ${NATS_URL:-nats://nats:4222}
       WITH_HEALTH_SERVICE: "true"
@@ -167,12 +167,13 @@ services:
       - draco
       - all
     ports:
-      - "8083:8083"
+      - "${DRACO_PORT:-8083}:8083"
     environment:
       NATS_URL: ${NATS_URL:-nats://nats:4222}
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8083"
+      RUST_LOG: ${RUST_LOG:-info}
     networks:
       - reticulum_dev
     depends_on:
@@ -191,9 +192,9 @@ services:
       - sculptor
       - all
     ports:
-      - "3001:3000"
+      - "${SCULPTOR_PORT:-3001}:3000"
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-development}
     networks:
       - reticulum_dev
     healthcheck:
