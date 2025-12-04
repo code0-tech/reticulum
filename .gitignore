@@ -1,6 +1,9 @@
 .idea/
 *.iml
 
+# environment files
+.env
+
 # generated dockerfiles
 container/sagittarius/Dockerfile
 container/sculptor/Dockerfile

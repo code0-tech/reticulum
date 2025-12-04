@@ -1,0 +1,210 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16.1
+    profiles:
+      - database
+      - sagittarius-web
+      - sagittarius-grpc
+      - sagittarius
+      - all
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: sagittarius
+      POSTGRES_PASSWORD: sagittarius
+      POSTGRES_DB: sagittarius_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - reticulum_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sagittarius"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NATS Message Broker
+  nats:
+    image: nats:2.11.9
+    profiles:
+      - messaging
+      - aquila
+      - taurus
+      - draco
+      - all
+    command:
+      - -js
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - reticulum_dev
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Sagittarius Rails Web Service
+  sagittarius-rails-web:
+    image: ghcr.io/code0-tech/sagittarius:latest
+    profiles:
+      - sagittarius-web
+      - sagittarius
+      - all
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: sagittarius
+      POSTGRES_PASSWORD: sagittarius
+      POSTGRES_DB: sagittarius_development
+    volumes:
+      - ./container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    networks:
+      - reticulum_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health/liveness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Sagittarius gRPC Service
+  sagittarius-grpc:
+    image: ghcr.io/code0-tech/sagittarius:latest
+    profiles:
+      - sagittarius-grpc
+      - sagittarius
+      - all
+    ports:
+      - "50051:50051"
+    environment:
+      RAILS_ENV: development
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: sagittarius
+      POSTGRES_PASSWORD: sagittarius
+      POSTGRES_DB: sagittarius_development
+      SAGITTARIUS_PREPARE_DATABASE: "true"
+    volumes:
+      - ./container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    command:
+      - bin/grpc_server
+    networks:
+      - reticulum_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=:50051"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Aquila Service
+  aquila:
+    image: ghcr.io/code0-tech/aquila:latest
+    profiles:
+      - aquila
+      - all
+    ports:
+      - "8081:8081"
+    environment:
+      NATS_URL: nats://nats:4222
+      MODE: dynamic
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8081"
+      SAGITTARIUS_URL: http://sagittarius-grpc:50051
+      RUNTIME_TOKEN: dev_runtime_token
+      RUST_LOG: info
+    networks:
+      - reticulum_dev
+    depends_on:
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Taurus Service
+  taurus:
+    image: ghcr.io/code0-tech/taurus:latest
+    profiles:
+      - taurus
+      - all
+    ports:
+      - "8082:8082"
+    environment:
+      NATS_URL: nats://nats:4222
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8082"
+      RUST_LOG: info
+    networks:
+      - reticulum_dev
+    depends_on:
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=:8082"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Draco Service
+  draco:
+    image: ghcr.io/code0-tech/draco:latest
+    profiles:
+      - draco
+      - all
+    ports:
+      - "8083:8083"
+    environment:
+      NATS_URL: nats://nats:4222
+      WITH_HEALTH_SERVICE: "true"
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: "8083"
+    networks:
+      - reticulum_dev
+    depends_on:
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=:8083"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Sculptor Service
+  sculptor:
+    image: ghcr.io/code0-tech/sculptor:latest
+    profiles:
+      - sculptor
+      - all
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+    networks:
+      - reticulum_dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  reticulum_dev:
+    driver: bridge
+
+volumes:
+  postgres_data:
