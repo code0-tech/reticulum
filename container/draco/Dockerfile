@@ -9,7 +9,7 @@ WORKDIR /draco/adapters/$VARIANT
 RUN cargo build --release
 RUN apk add openssl-dev openssl-libs-static pkgconfig && cargo install code0-cli && code0-cli download -f $VARIANT
 
-FROM alpine:3.22
+FROM alpine:3.23
 ARG VARIANT
 
 RUN apk --update add libc6-compat
