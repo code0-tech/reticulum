@@ -9,7 +9,6 @@ stages:
       - api_failure
       - data_integrity_failure
       - job_execution_timeout
-      - runner_provisioning_timeout
       - runner_system_failure
       - scheduler_failure
       - stuck_or_timeout_failure
