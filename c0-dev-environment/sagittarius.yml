@@ -1,0 +1,9 @@
+rails:
+  log_level: info
+  web:
+    force_ssl: false
+    port: 3000
+  db:
+    host: postgres
+    port: 5432
+

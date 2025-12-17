@@ -6,16 +6,40 @@ services:
     environment:
       POSTGRES_USER: sagittarius
       POSTGRES_PASSWORD: sagittarius
-      POSTGRES_DB: sagittarius_production
+      POSTGRES_DB: sagittarius_development
+    ports:
+      - "5432:5432"
+
+  sagittarius-rails-background:
+    depends_on:
+      - postgres
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2216096642-ee
+    networks:
+      - boot
+    command:
+      - bundle
+      - exec
+      - good_job
+    volumes:
+      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    environment:
+      RAILS_ENV: "development"
 
   sagittarius-rails-web:
     depends_on:
       - postgres
-    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2183733560-ee
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2216096642-ee
     networks:
       - boot
+    command:
+      - bin/rails
+      - s
+      - '-b'
+      - '0.0.0.0'
     volumes:
       - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    environment:
+      RAILS_ENV: "development"
     ports:
       - "3000:3000"
 
@@ -23,7 +47,7 @@ services:
   sagittarius-grpc:
     depends_on:
       - postgres
-    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2183733560-ee
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:2216096642-ee
     networks:
       - boot
     volumes:
@@ -32,6 +56,7 @@ services:
       - bin/grpc_server
     environment:
       SAGITTARIUS_PREPARE_DATABASE: "true"
+      RAILS_ENV: "development"
     ports:
       - "50051:50051"
 
@@ -48,7 +73,7 @@ services:
     depends_on:
       - nats
       - sagittarius-grpc
-    image: ghcr.io/code0-tech/reticulum/ci-builds/aquila:2174573653
+    image: ghcr.io/code0-tech/reticulum/ci-builds/aquila:2216096642
     networks:
       - boot
     environment:
@@ -58,13 +83,14 @@ services:
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       SAGITTARIUS_URL: http://sagittarius-grpc:50051
+      RUNTIME_TOKEN: "code1-runtime"
     ports:
       - "8081:8081"
 
   taurus:
     depends_on:
       - nats
-    image: ghcr.io/code0-tech/reticulum/ci-builds/taurus:2174573653
+    image: ghcr.io/code0-tech/reticulum/ci-builds/taurus:2216096642
     networks:
       - boot
     environment:
@@ -77,33 +103,27 @@ services:
       DEFINITION_PATH: '/definitions'
     ports:
       - "8082:8082"
-
   draco:
     depends_on:
       - nats
-    image: ghcr.io/code0-tech/reticulum/ci-builds/draco:2174573653-rest
+    image: ghcr.io/code0-tech/reticulum/ci-builds/draco:2216096642-rest
     networks:
       - boot
+    volumes:
+      - ./draco-definitions:/definitions
     environment:
       MODE: dynamic
-      AQUILA_URL: 'http://host.docker.internal:8081'
+      AQUILA_URL: 'http://aquila:8081'
       NATS_URL: nats://nats:4222
       NATS_BUCKET: 'flow_store'
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
       GRPC_PORT: "8083"
       DEFINITION_PATH: '/definitions'
+      HTTP_SERVER_PORT: 8084
+      HTTP_SERVER_HOST: "0.0.0.0"
     ports:
-      - "8083:8083"
-
-  sculptor:
-    depends_on:
-      - sagittarius-rails-web
-    image: ghcr.io/code0-tech/reticulum/ci-builds/sculptor:2174573653-ee
-    networks:
-      - boot
-    ports:
-      - "3000:3000"
+      - "8084:8084"
 
 networks:
   boot:
