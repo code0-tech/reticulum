@@ -36,6 +36,13 @@ function build_image() {
     container/$image/renderDockerfile
   fi
 
+  build_args+=" --label org.opencontainers.image.source=https://github.com/code0-tech/reticulum"
+  build_args+=" --label org.opencontainers.image.version=$reticulum_tag"
+
+  if [ -e "versions/$image" ]; then
+    build_args+=" --label org.opencontainers.image.revision=$(cat versions/$image)"
+  fi
+
   docker buildx build \
     -t "ghcr.io/code0-tech/reticulum/ci-builds/$image$reticulum_push_tag" \
     -f "container/$image/Dockerfile" \
@@ -49,6 +56,13 @@ function create_manifest() {
   reticulum_tag=$2
 
   args=(-t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag")
+  args+=(--annotation "index:org.opencontainers.image.source=https://github.com/code0-tech/reticulum")
+  args+=(--annotation "index:org.opencontainers.image.version=$reticulum_tag")
+
+  if [ -e "versions/$image" ]; then
+    args+=(--annotation "index:org.opencontainers.image.revision=$(cat versions/$image)")
+  fi
+
   for manifest in manifest-*.json; do
       args+=("$(jq -r '."image.name"' $manifest)@$(jq -r '."containerimage.digest"' $manifest)")
   done
