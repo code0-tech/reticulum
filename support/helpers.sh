@@ -1,6 +1,6 @@
 function download_project() {
   project=$1
-  version=$(cat versions/$project)
+  version=$(get_component_version $project)
   echo "Downloading $project at $version"
   mkdir -p projects
   curl --output projects/$project.tar.gz --fail-with-body -L "https://github.com/code0-tech/$project/archive/$version.tar.gz" || return 10
@@ -39,8 +39,8 @@ function build_image() {
   build_args+=" --label org.opencontainers.image.source=https://github.com/code0-tech/reticulum"
   build_args+=" --label org.opencontainers.image.version=$reticulum_tag"
 
-  if [ -e "versions/$image" ]; then
-    build_args+=" --label org.opencontainers.image.revision=$(cat versions/$image)"
+  if [[ -n "$(get_component_version $image)" ]]; then
+    build_args+=" --label org.opencontainers.image.revision=$(get_component_version $image)"
   fi
 
   docker buildx build \
@@ -59,8 +59,8 @@ function create_manifest() {
   args+=(--annotation "index:org.opencontainers.image.source=https://github.com/code0-tech/reticulum")
   args+=(--annotation "index:org.opencontainers.image.version=$reticulum_tag")
 
-  if [ -e "versions/$image" ]; then
-    args+=(--annotation "index:org.opencontainers.image.revision=$(cat versions/$image)")
+  if [[ -n "$(get_component_version $image)" ]]; then
+    args+=(--annotation "index:org.opencontainers.image.revision=$(get_component_version $image)")
   fi
 
   for manifest in manifest-*.json; do
@@ -77,5 +77,18 @@ function get_image_tag() {
     echo $reticulum_tag
   else
     echo $reticulum_tag-$reticulum_variant
+  fi
+}
+
+function get_component_version() {
+  component=$1
+  override_variable="OVERRIDE_${component}_VERSION"
+
+  if [[ -n "${!override_variable:+x}" ]]; then
+    echo ${!override_variable}
+  elif [[ -e "versions/$component" ]]; then
+    cat versions/$component
+  else
+    echo ""
   fi
 }
