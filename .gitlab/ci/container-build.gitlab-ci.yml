@@ -27,7 +27,7 @@
   script:
     - CACHE_TO=""
     - |
-      if [ "$C0_GH_REF_NAME" = "main" ]; then
+      if [ "$C0_GH_REF_NAME" = "main" ] && ! compgen -v | grep -q '^OVERRIDE_.*_VERSION$'; then
         CACHE_TO="--cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${PLATFORM}"
       fi
     - >
@@ -52,7 +52,7 @@
   script:
     - CACHE_TO=""
     - |
-      if [ "$C0_GH_REF_NAME" = "main" ]; then
+      if [ "$C0_GH_REF_NAME" = "main" ] && ! compgen -v | grep -q '^OVERRIDE_.*_VERSION$'; then
         CACHE_TO="--cache-to type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}"
       fi
     - >
