@@ -37,10 +37,9 @@ function build_image() {
   fi
 
   build_args+=" --label org.opencontainers.image.source=https://github.com/code0-tech/reticulum"
-  build_args+=" --label org.opencontainers.image.version=$reticulum_tag"
 
   if [[ -n "$(get_component_version $image)" ]]; then
-    build_args+=" --label org.opencontainers.image.revision=$(get_component_version $image)"
+    build_args+=" --label org.opencontainers.image.version=$(get_component_version $image)"
   fi
 
   docker buildx build \
@@ -51,16 +50,25 @@ function build_image() {
     .
 }
 
+function extract_version_from_image() {
+  image=$1
+  config_sha=$(sed -n 's/.*exporting config \(sha256:[a-f0-9]*\).*done/\1/p' build_output || echo "")
+  echo $config_sha >&2
+  docker buildx imagetools inspect \
+    "ghcr.io/code0-tech/reticulum/ci-builds/$image@$config_sha" \
+    --raw \
+    | jq -r '.config.Labels["org.opencontainers.image.version"] // ""'
+}
+
 function create_manifest() {
   image=$1
   reticulum_tag=$2
 
   args=(-t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag")
   args+=(--annotation "index:org.opencontainers.image.source=https://github.com/code0-tech/reticulum")
-  args+=(--annotation "index:org.opencontainers.image.version=$reticulum_tag")
 
-  if [[ -n "$(get_component_version $image)" ]]; then
-    args+=(--annotation "index:org.opencontainers.image.revision=$(get_component_version $image)")
+  if [[ -n "$(cat version_label)" ]]; then
+    args+=(--annotation "index:org.opencontainers.image.version=$(cat version_label)")
   fi
 
   for manifest in manifest-*.json; do

@@ -37,12 +37,16 @@
       "
         --output type=registry,push-by-digest=true 
         --metadata-file manifest-${CI_JOB_ID}.json
+        --progress=plain
         --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${PLATFORM}
         $CACHE_TO
       "
       ""
+      2>&1 | tee build_output
+    - extract_version_from_image $image | tee version_label
   artifacts:
     paths:
+      - version_label
       - manifest-*.json
     expire_in: 1 day
 
@@ -63,12 +67,16 @@
         --build-arg VARIANT=$VARIANT
         --output type=registry,push-by-digest=true
         --metadata-file manifest-${CI_JOB_ID}.json
+        --progress=plain
         --cache-from type=registry,ref=ghcr.io/code0-tech/reticulum/ci-cache:${image}-${VARIANT}-${PLATFORM}
         $CACHE_TO
       "
       ""
+      2>&1 | tee build_output
+    - extract_version_from_image $image | tee version_label
   artifacts:
     paths:
+      - version_label
       - manifest-*.json
     expire_in: 1 day
 
