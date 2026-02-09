@@ -98,6 +98,7 @@ container:boot:draco:
     matrix:
       - DRACO_VARIANT:
           - rest
+          - cron
         PLATFORM:
           - amd64
           - arm64
