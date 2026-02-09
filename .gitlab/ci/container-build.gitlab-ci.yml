@@ -135,6 +135,7 @@ container:draco:
     matrix:
       - VARIANT:
           - rest
+          - cron
         PLATFORM:
           - amd64
           - arm64
@@ -146,6 +147,7 @@ manifest:draco:
     matrix:
       - VARIANT:
           - rest
+          - cron
   needs:
     - job: container:draco
       parallel:
