@@ -38,6 +38,10 @@ function build_image() {
 
   build_args+=" --label org.opencontainers.image.source=https://github.com/code0-tech/reticulum"
 
+  if [[ -n "$CI_PIPELINE_ID" ]]; then
+    build_args+=" --label tech.code0.reticulum.pipeline.id=$CI_PIPELINE_ID"
+  fi
+
   if [[ -n "$(get_component_version $image)" ]]; then
     build_args+=" --label org.opencontainers.image.version=$(get_component_version $image)"
   fi
@@ -66,6 +70,10 @@ function create_manifest() {
 
   args=(-t "ghcr.io/code0-tech/reticulum/ci-builds/$image:$reticulum_tag")
   args+=(--annotation "index:org.opencontainers.image.source=https://github.com/code0-tech/reticulum")
+
+  if [[ -n "$CI_PIPELINE_ID" ]]; then
+    args+=(--annotation "index:tech.code0.reticulum.pipeline.id=$CI_PIPELINE_ID")
+  fi
 
   if [[ -n "$(cat version_label)" ]]; then
     args+=(--annotation "index:org.opencontainers.image.version=$(cat version_label)")
