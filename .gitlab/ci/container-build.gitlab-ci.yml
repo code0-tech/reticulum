@@ -33,7 +33,7 @@
     - >
       build_image
       $image
-      $CI_PIPELINE_ID
+      $RETICULUM_CONTAINER_VERSION
       "
         --output type=registry,push-by-digest=true 
         --metadata-file manifest-${CI_JOB_ID}.json
@@ -62,7 +62,7 @@
     - >
       build_image 
       $image
-      $CI_PIPELINE_ID 
+      $RETICULUM_CONTAINER_VERSION
       "
         --build-arg VARIANT=$VARIANT
         --output type=registry,push-by-digest=true
@@ -86,34 +86,40 @@
   variables:
     PLATFORM: amd64
   script:
-    - create_manifest $image $(get_image_tag $CI_PIPELINE_ID $VARIANT)
+    - create_manifest $image $(get_image_tag $RETICULUM_CONTAINER_VERSION $VARIANT)
 
 container:mise:
   extends:
     - .single-image-build-base
+  needs:
+    - generate-environment
 
 manifest:mise:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:mise
 
 container:rust:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:mise
 
 manifest:rust:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:rust
 
 container:aquila:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
@@ -122,12 +128,14 @@ manifest:aquila:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:aquila
 
 container:draco:
   extends:
     - .variant-image-build-base
   needs:
+    - generate-environment
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
@@ -149,6 +157,7 @@ manifest:draco:
           - rest
           - cron
   needs:
+    - generate-environment
     - job: container:draco
       parallel:
         matrix:
@@ -161,6 +170,7 @@ container:taurus:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
@@ -169,36 +179,42 @@ manifest:taurus:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:taurus
 
 container:ruby:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:mise
 
 manifest:ruby:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:ruby
 
 container:postgresql:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:mise
 
 manifest:postgresql:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:postgresql
 
 container:sagittarius:
   extends:
     - .variant-image-build-base
   needs:
+    - generate-environment
     - manifest:ruby
     - manifest:postgresql
   variables:
@@ -221,6 +237,7 @@ manifest:sagittarius:
           - ce
           - ee
   needs:
+    - generate-environment
     - job: container:sagittarius
       parallel:
         matrix:
@@ -233,18 +250,21 @@ container:node:
   extends:
     - .single-image-build-base
   needs:
+    - generate-environment
     - manifest:mise
 
 manifest:node:
   extends:
     - .manifest-create-base
   needs:
+    - generate-environment
     - container:node
 
 container:sculptor:
   extends:
     - .variant-image-build-base
   needs:
+    - generate-environment
     - manifest:node
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
@@ -268,6 +288,7 @@ manifest:sculptor:
           - ee
           - cloud
   needs:
+    - generate-environment
     - job: container:sculptor
       parallel:
         matrix:
