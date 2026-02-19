@@ -6,7 +6,7 @@ WORKDIR /aquila
 COPY projects/aquila .
 RUN cargo build --release
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 RUN apk --update add libc6-compat
 COPY --from=builder /aquila/target/release/aquila .

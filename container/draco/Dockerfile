@@ -18,7 +18,7 @@ RUN cargo install --version $CODE0_CLI_VERSION code0-cli
 ARG DEFINITION_VERSION=def-0.0.19
 RUN code0-cli download -f $VARIANT -t $DEFINITION_VERSION
 
-FROM alpine:3.22
+FROM alpine:3.23
 ARG VARIANT
 
 RUN apk --update add libc6-compat

@@ -1,6 +1,6 @@
 generate-environment:
   stage: prepare
-  image: alpine:3.22
+  image: alpine:3.23
   script:
     - echo "RETICULUM_CONTAINER_VERSION=$(cat VERSION)-experimental-$CI_PIPELINE_ID-$CI_COMMIT_SHA" > .gitlab/ci/env
     - |
