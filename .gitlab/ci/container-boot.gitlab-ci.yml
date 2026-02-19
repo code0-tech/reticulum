@@ -18,6 +18,7 @@
   extends:
     - .container:boot
   needs:
+    - generate-environment
     - manifest:sagittarius
   parallel:
     matrix:
@@ -57,6 +58,7 @@ container:boot:aquila:
   extends:
     - .container:boot
   needs:
+    - generate-environment
     - manifest:aquila
     - manifest:sagittarius
   variables:
@@ -80,6 +82,7 @@ container:boot:taurus:
   extends:
     - .container:boot
   needs:
+    - generate-environment
     - manifest:taurus
   script:
     - bundle install
@@ -93,6 +96,7 @@ container:boot:draco:
   extends:
     - .container:boot
   needs:
+    - generate-environment
     - manifest:draco
   parallel:
     matrix:
@@ -114,6 +118,7 @@ container:boot:sculptor:
   extends:
     - .container:boot
   needs:
+    - generate-environment
     - manifest:sculptor
   parallel:
     matrix:
