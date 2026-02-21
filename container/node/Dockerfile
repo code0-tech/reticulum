@@ -1,12 +1,12 @@
 ARG RETICULUM_IMAGE_TAG=local
 # renovate: datasource=docker depName=node
-ARG NODE_VERSION=24.13.0
+ARG NODE_VERSION=24.13.1
 
 FROM node:$NODE_VERSION-alpine AS node_image
 FROM ghcr.io/code0-tech/reticulum/ci-builds/mise:$RETICULUM_IMAGE_TAG
 
 # renovate: datasource=docker depName=node
-ARG NODE_VERSION=24.13.0
+ARG NODE_VERSION=24.13.1
 LABEL org.opencontainers.image.version=$NODE_VERSION
 
 COPY --from=node_image /usr/lib /usr/lib
