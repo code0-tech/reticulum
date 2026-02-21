@@ -3,6 +3,18 @@ stages:
   - container
   - container:boot
 
+workflow:
+  rules:
+    # do not run pipeline if release-tools pushes
+    - if: $CI_PIPELINE_SOURCE == "push" && $GITLAB_USER_LOGIN == "code0-release-tools"
+      when: never
+    # trigger a pipeline when triggered by api
+    - if: $CI_PIPELINE_SOURCE == "api"
+    # trigger a pipeline when triggered from upstream project
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
+    # trigger a pipeline when triggerd manually
+    - if: $CI_PIPELINE_SOURCE == "web"
+
 .default-retry:
   retry:
     max: 2
