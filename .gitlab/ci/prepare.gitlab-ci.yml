@@ -2,11 +2,13 @@ generate-environment:
   stage: prepare
   image: alpine:3.22
   script:
-    - echo "RETICULUM_CONTAINER_VERSION=$(cat VERSION)-experimental-$CI_PIPELINE_ID-$CI_COMMIT_SHA" > .gitlab/ci/env
+    - echo "RETICULUM_CONTAINER_VERSION=$(cat VERSION)-$RETICULUM_BUILD_TYPE-$CI_PIPELINE_ID-$CI_COMMIT_SHA" > .gitlab/ci/env
     - |
       echo -e "\e[0Ksection_start:`date +%s`:glpa_summary\r\e[0KHeader of the summary"
       grep 'RETICULUM_CONTAINER_VERSION=' .gitlab/ci/env
       echo -e "\e[0Ksection_end:`date +%s`:glpa_summary\r\e[0K"
+  variables:
+    RETICULUM_BUILD_TYPE: experimental
   artifacts:
     expire_in: 1 day
     reports:
