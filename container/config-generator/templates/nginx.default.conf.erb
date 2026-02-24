@@ -1,0 +1,86 @@
+upstream sagittarius_rails_web {
+  server <%= sagittarius_rails_host %>:<%= sagittarius_rails_port %>;
+}
+
+upstream sagittarius_grpc {
+  server <%= sagittarius_grpc_host %>:<%= sagittarius_grpc_port %>;
+}
+
+upstream sculptor {
+  server <%= sculptor_host %>:<%= sculptor_port %>;
+}
+
+server {
+  listen 80 http2;
+  server_name <%= hostname %>;
+
+  # Rails API routes - exact matches first
+  location = /graphql {
+    proxy_pass http://sagittarius_rails_web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location = /files/upload {
+    proxy_pass http://sagittarius_rails_web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Increase limits for file uploads
+    client_max_body_size 100M;
+  }
+
+  location = /health/liveness {
+    proxy_pass http://sagittarius_rails_web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  # GoodJob admin interface
+  location /good_job {
+    proxy_pass http://sagittarius_rails_web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location = /error502grpc {
+    internal;
+    default_type application/grpc;
+    add_header grpc-status 14;
+    add_header grpc-message "unavailable";
+    return 204;
+  }
+
+  # Everything else goes to Sculptor
+  location / {
+    if ($content_type = "application/grpc") {
+      grpc_pass grpc://sagittarius_grpc;
+    }
+    grpc_set_header X-Real-IP $remote_addr;
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # Disable buffering for streaming
+    grpc_read_timeout 1h;
+    grpc_send_timeout 1h;
+
+    # Keep connection alive for long-running streams
+    grpc_socket_keepalive on;
+
+    # Error handling
+    error_page 502 = /error502grpc;
+
+    proxy_pass http://sculptor;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
