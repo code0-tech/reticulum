@@ -98,7 +98,7 @@ function get_image_tag() {
 
 function get_component_version() {
   component=$1
-  override_variable="OVERRIDE_${component}_VERSION"
+  override_variable="OVERRIDE_${component//-/_}_VERSION"
 
   if [[ -n "${!override_variable:+x}" ]]; then
     echo ${!override_variable}

@@ -71,18 +71,6 @@ class ConfigGenerator
     raise
   end
 
-  # Dynamic method for accessing environment variables
-  def method_missing(method_name, *args)
-    var_name = method_name.to_s.upcase
-    return @env[var_name] if @env.key?(var_name)
-
-    super
-  end
-
-  def respond_to_missing?(method_name, include_private = false)
-    @env.key?(method_name.to_s.upcase) || super
-  end
-
   # Helper methods for templates
   def env(key, default = nil)
     @env.fetch(key, default)

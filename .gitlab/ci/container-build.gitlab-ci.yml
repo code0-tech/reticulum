@@ -196,6 +196,20 @@ manifest:ruby:
     - generate-environment
     - container:ruby
 
+container:config-generator:
+  extends:
+    - .single-image-build-base
+  needs:
+    - generate-environment
+    - manifest:ruby
+
+manifest:config-generator:
+  extends:
+    - .manifest-create-base
+  needs:
+    - generate-environment
+    - container:config-generator
+
 container:postgresql:
   extends:
     - .single-image-build-base

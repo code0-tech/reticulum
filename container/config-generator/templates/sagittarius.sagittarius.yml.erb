@@ -1,8 +1,8 @@
 rails:
   web:
     force_ssl: false
-  log_level: debug
+  log_level: <%= env('SAGITTARIUS_LOG_LEVEL', 'info') %>
   threads: 3
   db:
-    host: <%= postgres_host %>
-    port: <%= postgres_port %>
+    host: <%= env('POSTGRES_HOST') %>
+    port: <%= env('POSTGRES_PORT') %>
