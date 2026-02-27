@@ -4,6 +4,7 @@ FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG
 
 WORKDIR /sculptor
 
+COPY projects/sculptor/public public
 COPY projects/sculptor/edition.mjs \
      projects/sculptor/graphql-imports.d.ts \
      projects/sculptor/next.config.ts \
