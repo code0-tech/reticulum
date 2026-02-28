@@ -118,7 +118,7 @@ services:
       - ide
 
   nats:
-    image: nats:2.11.9
+    image: nats:2.12.4
     command:
       - -js
     profiles:
