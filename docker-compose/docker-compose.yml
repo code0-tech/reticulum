@@ -1,3 +1,5 @@
+name: codezero
+
 services:
   config-generator:
     image: ${IMAGE_REGISTRY}/config-generator:${IMAGE_TAG}
