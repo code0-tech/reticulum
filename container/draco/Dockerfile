@@ -5,6 +5,10 @@ ARG VARIANT
 
 WORKDIR /draco
 COPY projects/draco .
+
+ARG RETICULUM_IMAGE_TAG=local
+RUN sed -i "s/version = \"0.0.0\"/version = \"$RETICULUM_IMAGE_TAG\"/" Cargo.toml
+
 WORKDIR /draco/adapters/$VARIANT
 RUN cargo build --release
 

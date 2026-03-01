@@ -4,6 +4,10 @@ FROM ghcr.io/code0-tech/reticulum/ci-builds/rust:$RETICULUM_IMAGE_TAG AS builder
 
 WORKDIR /taurus
 COPY projects/taurus .
+
+ARG RETICULUM_IMAGE_TAG=local
+RUN sed -i "s/version = \"0.0.0\"/version = \"$RETICULUM_IMAGE_TAG\"/" Cargo.toml
+
 RUN cargo build --release
 
 RUN apk add openssl-dev openssl-libs-static pkgconfig
