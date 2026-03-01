@@ -12,7 +12,7 @@ services:
       - ide
 
   postgres:
-    image: postgres:16.1
+    image: postgres:18.3
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
