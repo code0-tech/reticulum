@@ -31,6 +31,9 @@ COPY projects/sculptor/src/packages/cloud src/packages/cloud
 
 ENV EDITION=<%= variant %>
 
+ARG RETICULUM_IMAGE_TAG=local
+RUN npm version --git-tag-version=false $RETICULUM_IMAGE_TAG
+
 RUN npm run build
 
 ENTRYPOINT ["npm", "run", "start"]
