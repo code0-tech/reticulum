@@ -115,6 +115,20 @@ manifest:rust:
     - generate-environment
     - container:rust
 
+container:definitions:
+  extends:
+    - .single-image-build-base
+  needs:
+    - generate-environment
+    - manifest:rust
+
+manifest:definitions:
+  extends:
+    - .manifest-create-base
+  needs:
+    - generate-environment
+    - container:definitions
+
 container:aquila:
   extends:
     - .single-image-build-base
@@ -136,7 +150,7 @@ container:draco:
     - .variant-image-build-base
   needs:
     - generate-environment
-    - manifest:rust
+    - manifest:definitions
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
   parallel:
@@ -171,7 +185,7 @@ container:taurus:
     - .single-image-build-base
   needs:
     - generate-environment
-    - manifest:rust
+    - manifest:definitions
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
 
