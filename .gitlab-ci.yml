@@ -2,6 +2,7 @@ stages:
   - prepare
   - container
   - container:boot
+  - test
 
 workflow:
   rules:
