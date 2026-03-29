@@ -39,5 +39,9 @@ workflow:
       alias: docker
       entrypoint: [ "sh", "-c", "dockerd-entrypoint.sh $DOCKER_OPTIONS" ]
 
+
 include:
   - local: .gitlab/ci/*.gitlab-ci.yml
+  - project: code0-tech/development/telescopium
+    ref: build-branch
+    file: ci-template.gitlab-ci.yml
