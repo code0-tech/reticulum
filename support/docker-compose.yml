@@ -13,7 +13,7 @@ services:
     networks:
       - boot
     volumes:
-      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+      - ./config/sagittarius.yml:/sagittarius/config/sagittarius.yml
 
   curl-sagittarius-rails-web:
     image: curlimages/curl:8.18.0
@@ -35,7 +35,7 @@ services:
     networks:
       - boot
     volumes:
-      - ../container/sagittarius/sagittarius.yml:/sagittarius/config/sagittarius.yml
+      - ./config/sagittarius.yml:/sagittarius/config/sagittarius.yml
     command:
       - bin/grpc_server
     environment:
@@ -61,6 +61,8 @@ services:
       GRPC_HOST: 0.0.0.0
       SAGITTARIUS_URL: http://sagittarius-grpc:50051
       RUNTIME_TOKEN: runtime_token
+    volumes:
+      - ./config/aquila.actions.json:/action.configuration.json
     ports:
       - "8081:8081"
 
