@@ -61,6 +61,8 @@ services:
       GRPC_HOST: 0.0.0.0
       SAGITTARIUS_URL: http://sagittarius-grpc:50051
       RUNTIME_TOKEN: runtime_token
+    volumes:
+      - ./config/aquila.actions.json:/action.configuration.json
     ports:
       - "8081:8081"
 
