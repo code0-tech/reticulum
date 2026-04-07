@@ -7,7 +7,7 @@ WORKDIR /
 RUN apk add openssl-dev openssl-libs-static pkgconfig
 
 # renovate: datasource=crate depName=code0-cli
-ARG CODE0_CLI_VERSION=0.0.8
+ARG CODE0_CLI_VERSION=0.0.12
 RUN cargo install --version $CODE0_CLI_VERSION code0-cli
 
 # renovate: datasource=github-releases depName=code0-tech/code0-definition versioning=regex:^def-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
