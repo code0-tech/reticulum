@@ -16,7 +16,7 @@ services:
       - ./config/sagittarius.yml:/sagittarius/config/sagittarius.yml
 
   curl-sagittarius-rails-web:
-    image: curlimages/curl:8.18.0
+    image: curlimages/curl:8.19.0
     networks:
       - boot
     command:
@@ -96,7 +96,7 @@ services:
       - boot
 
   curl-sculptor:
-    image: curlimages/curl:8.18.0
+    image: curlimages/curl:8.19.0
     networks:
       - boot
     command:
