@@ -123,6 +123,7 @@ services:
     image: nats:2.11.9
     command:
       - -js
+    restart: unless-stopped
     profiles:
       - runtime
 
@@ -137,6 +138,7 @@ services:
       GRPC_HOST: 0.0.0.0
       SAGITTARIUS_URL: "${AQUILA_SAGITTARIUS_URL}"
       RUNTIME_TOKEN: "${AQUILA_SAGITTARIUS_TOKEN}"
+    restart: unless-stopped
     profiles:
       - runtime
 
@@ -150,6 +152,7 @@ services:
       AQUILA_URL: 'http://aquila:8081'
       NATS_URL: nats://nats:4222
       DEFINITION_PATH: '/definitions'
+    restart: unless-stopped
     profiles:
       - runtime
 
@@ -167,6 +170,7 @@ services:
       HTTP_SERVER_HOST: "0.0.0.0"
     ports:
       - "${DRACO_REST_PORT}:8084"
+    restart: unless-stopped
     profiles:
       - runtime
 
@@ -180,6 +184,7 @@ services:
       NATS_URL: nats://nats:4222
       NATS_BUCKET: 'flow_store'
       DEFINITION_PATH: '/definitions'
+    restart: unless-stopped
     profiles:
       - runtime
 
