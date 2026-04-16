@@ -1,8 +1,0 @@
-{
-  "actions": [
-    {
-      "service_name": "dummy-action",
-      "token": "dummy-token"
-    }
-  ]
-}
