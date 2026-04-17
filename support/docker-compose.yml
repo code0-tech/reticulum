@@ -62,7 +62,7 @@ services:
       SAGITTARIUS_URL: http://sagittarius-grpc:50051
       RUNTIME_TOKEN: runtime_token
     volumes:
-      - ./config/aquila.actions.json:/action.configuration.json
+      - ./config/aquila.service.configuration.json:/service.configuration.json
     ports:
       - "8081:8081"
 
@@ -71,6 +71,10 @@ services:
     networks:
       - boot
     environment:
+      MODE: dynamic
+      AQUILA_URL: 'http://aquila:8081'
+      AQUILA_TOKEN: taurus
+      DEFINITION_PATH: '/definitions'
       NATS_URL: nats://nats:4222
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0
@@ -83,6 +87,10 @@ services:
     networks:
       - boot
     environment:
+      MODE: dynamic
+      AQUILA_URL: 'http://aquila:8081'
+      AQUILA_TOKEN: draco
+      DEFINITION_PATH: '/definitions'
       NATS_URL: nats://nats:4222
       WITH_HEALTH_SERVICE: "true"
       GRPC_HOST: 0.0.0.0

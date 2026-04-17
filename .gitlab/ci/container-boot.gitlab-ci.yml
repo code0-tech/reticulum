@@ -54,6 +54,16 @@ container:boot:sagittarius:grpc:
     - support/grpc_check_health --host docker:50051 --service liveness --retries 20
     - support/grpc_check_health --host docker:50051 --service readiness --retries 20
 
+.container:boot:sagittarius-grpc-preparation:
+  - bundle install
+  - docker compose up postgres -d
+  - docker compose up sagittarius-grpc -d
+  - docker ps --all
+  - docker compose logs sagittarius-grpc -f &
+  - support/grpc_check_health --host docker:50051 --service readiness --retries 20
+  - >
+    docker compose exec sagittarius-grpc bin/rails runner 'Runtime.create!(name: "Boot Test Runtime", token: "runtime_token")'
+
 container:boot:aquila:
   extends:
     - .container:boot
@@ -64,15 +74,8 @@ container:boot:aquila:
   variables:
     SAGITTARIUS_VARIANT: ce
   script:
-    - bundle install
-    - docker compose up postgres -d
+    - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
-    - docker compose up sagittarius-grpc -d
-    - docker ps --all
-    - docker compose logs sagittarius-grpc -f &
-    - support/grpc_check_health --host docker:50051 --service readiness --retries 20
-    - >
-      docker compose exec sagittarius-grpc bin/rails runner 'Runtime.create!(name: "Boot Test Runtime", token: "runtime_token")'
     - docker compose up aquila -d
     - docker compose logs aquila -f &
     - support/grpc_check_health --host docker:8081 --service liveness --retries 20
@@ -83,10 +86,15 @@ container:boot:taurus:
     - .container:boot
   needs:
     - generate-environment
+    - manifest:aquila
+    - manifest:sagittarius
     - manifest:taurus
+  variables:
+    SAGITTARIUS_VARIANT: ce
   script:
-    - bundle install
+    - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
+    - docker compose up aquila -d
     - docker compose up taurus -d
     - docker compose logs taurus -f &
     - support/grpc_check_health --host docker:8082 --service liveness --retries 20
@@ -97,7 +105,12 @@ container:boot:draco:
     - .container:boot
   needs:
     - generate-environment
+    - manifest:aquila
+    - manifest:sagittarius
+    - manifest:taurus
     - manifest:draco
+  variables:
+    SAGITTARIUS_VARIANT: ce
   parallel:
     matrix:
       - DRACO_VARIANT:
@@ -107,8 +120,10 @@ container:boot:draco:
           - amd64
           - arm64
   script:
-    - bundle install
+    - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
+    - docker compose up aquila -d
+    - docker compose up taurus -d
     - docker compose up draco -d
     - docker compose logs draco -f &
     - support/grpc_check_health --host docker:8083 --service liveness --retries 20
