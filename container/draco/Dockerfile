@@ -14,7 +14,7 @@ RUN sed -i "s/version = \"0.0.0\"/version = \"$RETICULUM_IMAGE_TAG\"/" Cargo.tom
 WORKDIR /draco/adapters/$VARIANT
 RUN cargo build --release
 
-FROM alpine:3.22
+FROM alpine:3.23
 ARG VARIANT
 
 RUN apk --update add libc6-compat
