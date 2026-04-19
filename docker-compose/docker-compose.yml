@@ -39,6 +39,7 @@ services:
     environment:
       INITIAL_ROOT_PASSWORD: ${INITIAL_ROOT_PASSWORD}
       INITIAL_ROOT_MAIL: ${INITIAL_ROOT_MAIL}
+      INITIAL_RUNTIME_TOKEN: ${INITIAL_RUNTIME_TOKEN}
     volumes:
       - generated-configs:/tmp/generated-configs:ro
     entrypoint: |
