@@ -36,7 +36,7 @@ workflow:
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: /certs
   services:
-    - name: docker:29.4.0-dind
+    - name: docker:29.4.1-dind
       alias: docker
       entrypoint: [ "sh", "-c", "dockerd-entrypoint.sh $DOCKER_OPTIONS" ]
 
