@@ -10,7 +10,7 @@ RUN sed -i "s/version = \"0.0.0\"/version = \"$RETICULUM_IMAGE_TAG\"/" Cargo.tom
 
 RUN cargo build --release
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 RUN apk --update add libc6-compat
 COPY --from=builder /aquila/target/release/aquila .
