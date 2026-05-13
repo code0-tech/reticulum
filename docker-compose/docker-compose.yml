@@ -95,7 +95,7 @@ services:
       - ide
 
   nginx:
-    image: nginx:1.30.0-alpine-slim
+    image: nginx:1.31.0-alpine-slim
     depends_on:
       config-generator:
         condition: service_completed_successfully
