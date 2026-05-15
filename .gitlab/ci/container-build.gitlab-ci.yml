@@ -252,6 +252,7 @@ container:sagittarius:
       - VARIANT:
           - ce
           - ee
+          - cloud
         PLATFORM:
           - amd64
           - arm64
@@ -264,6 +265,7 @@ manifest:sagittarius:
       - VARIANT:
           - ce
           - ee
+          - cloud
   needs:
     - generate-environment
     - job: container:sagittarius
