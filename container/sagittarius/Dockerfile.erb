@@ -39,12 +39,15 @@ COPY projects/sagittarius/config/ config/
 COPY projects/sagittarius/lib/ lib/
 COPY projects/sagittarius/db/ db/
 COPY projects/sagittarius/app/ app/
-<% if ee? %>
+<% if ee? || cloud? %>
 COPY projects/sagittarius/extensions/ee/app/ extensions/ee/app/
+<% end %>
+<% if cloud? %>
+COPY projects/sagittarius/extensions/cloud/app/ extensions/cloud/app/
 <% end %>
 
 # Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/ <% if ee? %>extensions/ee/app/<% end %>
+RUN bundle exec bootsnap precompile app/ lib/ <% if ee? || cloud? %>extensions/ee/app/<% end %> <% if cloud? %>extensions/cloud/app/<% end %>
 
 ARG RETICULUM_IMAGE_TAG=local
 RUN echo "$RETICULUM_IMAGE_TAG" > VERSION

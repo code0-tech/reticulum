@@ -25,6 +25,7 @@
       - SAGITTARIUS_VARIANT:
           - ce
           - ee
+          - cloud
         PLATFORM:
           - amd64
           - arm64
