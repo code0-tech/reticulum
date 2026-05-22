@@ -326,3 +326,18 @@ manifest:sculptor:
             PLATFORM:
               - amd64
               - arm64
+
+container:velorum:
+  extends:
+    - .single-image-build-base
+  needs:
+    - generate-environment
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
+
+manifest:velorum:
+  extends:
+    - .manifest-create-base
+  needs:
+    - generate-environment
+    - container:velorum
