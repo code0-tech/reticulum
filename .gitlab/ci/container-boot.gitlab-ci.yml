@@ -150,3 +150,38 @@ container:boot:sculptor:
     - docker ps --all
     - docker compose logs sculptor -f &
     - docker compose run curl-sculptor
+
+container:boot:velorum:
+  extends:
+    - .container:boot
+  needs:
+    - generate-environment
+    - manifest:velorum
+  script:
+    - bundle install
+    - docker compose up velorum -d
+    - docker compose logs velorum -f &
+    - support/grpc_check_health --host docker:50052 --service liveness --retries 20
+    - support/grpc_check_health --host docker:50052 --service readiness --retries 20
+
+container:boot:velorum:offline:
+  extends:
+    - .container:boot
+  needs:
+    - generate-environment
+    - manifest:velorum
+  script:
+    - docker compose up velorum-offline -d
+    - docker compose logs velorum-offline -f &
+    - |
+      for i in $(seq 1 30); do
+        STATUS=$(docker inspect --format='{{.State.Health.Status}}' $(docker compose ps -q velorum-offline) 2>/dev/null || echo "starting")
+        echo "Attempt $i/30: $STATUS"
+        if [ "$STATUS" = "healthy" ]; then
+          echo "Velorum booted successfully without network access"
+          exit 0
+        fi
+        sleep 1
+      done
+      echo "Timed out waiting for healthy status"
+      exit 1
