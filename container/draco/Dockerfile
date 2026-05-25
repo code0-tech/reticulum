@@ -19,6 +19,6 @@ ARG VARIANT
 
 RUN apk --update add libc6-compat
 COPY --from=builder /draco/target/release/$VARIANT /draco
-COPY --from=definitions /definitions/$VARIANT /definitions/$VARIANT
+COPY --from=definitions /definitions/draco_$VARIANT /definitions/draco_$VARIANT
 
 CMD ["/draco"]

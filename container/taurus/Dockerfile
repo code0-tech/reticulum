@@ -16,6 +16,6 @@ FROM alpine:3.23
 
 RUN apk --update add libc6-compat
 COPY --from=builder /taurus/target/release/taurus /taurus
-COPY --from=definitions /definitions/standard /definitions/standard
+COPY --from=definitions /definitions/taurus /definitions/taurus
 
 CMD ["/taurus"]
