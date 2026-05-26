@@ -89,7 +89,7 @@ services:
     environment:
       MODE: dynamic
       AQUILA_URL: 'http://aquila:8081'
-      AQUILA_TOKEN: draco
+      AQUILA_TOKEN: draco-${DRACO_VARIANT}
       DEFINITION_PATH: '/definitions'
       NATS_URL: nats://nats:4222
       WITH_HEALTH_SERVICE: "true"

@@ -5,8 +5,12 @@
       "token": "taurus"
     },
     {
-      "identifier": "draco",
-      "token": "draco"
+      "identifier": "draco-rest",
+      "token": "draco-rest"
+    },
+    {
+      "identifier": "draco-cron",
+      "token": "draco-cron"
     }
   ]
 }
