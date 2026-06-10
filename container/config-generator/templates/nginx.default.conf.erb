@@ -2,6 +2,12 @@ upstream sagittarius_rails_web {
   server <%= env('SAGITTARIUS_RAILS_HOST') %>:<%= env('SAGITTARIUS_RAILS_PORT') %>;
 }
 
+<% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
+upstream sagittarius_cable {
+  server <%= env('SAGITTARIUS_CABLE_HOST') %>:<%= env('SAGITTARIUS_CABLE_PORT') %>;
+}
+<% end %>
+
 upstream sagittarius_grpc {
   server <%= env('SAGITTARIUS_GRPC_HOST') %>:<%= env('SAGITTARIUS_GRPC_PORT') %>;
 }
@@ -65,6 +71,21 @@ server {
 
   location /good_job {
     proxy_pass http://sagittarius_rails_web;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  location = /cable {
+<% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
+    proxy_pass http://sagittarius_cable;
+<% else %>
+    proxy_pass http://sagittarius_rails_web;
+<% end %>
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
