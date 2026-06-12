@@ -79,6 +79,10 @@ class ConfigGenerator
   def env?(key)
     @env[key] == 'true'
   end
+
+  def env_set?(key)
+    @env.fetch(key, nil) != nil
+  end
 end
 
 # Run the generator

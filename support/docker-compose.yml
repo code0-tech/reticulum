@@ -43,6 +43,35 @@ services:
     ports:
       - "50051:50051"
 
+  sagittarius-rails-cable:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius:${RETICULUM_CONTAINER_VERSION}-${SAGITTARIUS_VARIANT}
+    networks:
+      - boot
+    volumes:
+      - ./config/sagittarius.yml:/sagittarius/config/sagittarius.yml
+    command:
+      - bundle
+      - exec
+      - puma
+      - config.cable.ru
+    environment:
+      SAGITTARIUS_PREPARE_DATABASE: "true"
+
+  curl-sagittarius-rails-cable:
+    image: curlimages/curl:8.20.0
+    networks:
+      - boot
+    command:
+      - curl
+      - --fail
+      - -sv
+      - --retry
+      - "20"
+      - --retry-delay
+      - "3"
+      - --retry-connrefused
+      - http://sagittarius-rails-cable:3000/health/liveness
+
   nats:
     image: nats:2.14.0
     networks:

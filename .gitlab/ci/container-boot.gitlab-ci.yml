@@ -43,6 +43,14 @@ container:boot:sagittarius:rails-web:
   script:
     - docker compose run curl-sagittarius-rails-web
 
+container:boot:sagittarius:rails-cable:
+  extends:
+    - .container:boot:sagittarius
+  variables:
+    SAGITTARIUS_SERVICE: rails-cable
+  script:
+    - docker compose run curl-sagittarius-rails-cable
+
 container:boot:sagittarius:grpc:
   extends:
     - .container:boot:sagittarius

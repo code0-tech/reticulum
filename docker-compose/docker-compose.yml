@@ -88,6 +88,22 @@ services:
     profiles:
       - ide
 
+  sagittarius-rails-cable:
+    image: ${IMAGE_REGISTRY}/sagittarius:${IMAGE_TAG}-${IMAGE_EDITION}
+    depends_on:
+      sagittarius-rails-web:
+        condition: service_healthy
+    volumes:
+      - generated-configs:/tmp/generated-configs:ro
+    entrypoint: |
+      sh -c "
+        cp /tmp/generated-configs/sagittarius.sagittarius.yml config/sagittarius.yml
+        exec bin/docker-entrypoint bundle exec puma config.cable.ru
+      "
+    restart: unless-stopped
+    profiles:
+      - ide
+
   sculptor:
     image: ${IMAGE_REGISTRY}/sculptor:${IMAGE_TAG}-${IMAGE_EDITION}
     restart: unless-stopped
@@ -100,6 +116,8 @@ services:
       config-generator:
         condition: service_completed_successfully
       sagittarius-rails-web:
+        condition: service_started
+      sagittarius-rails-cable:
         condition: service_started
       sagittarius-grpc:
         condition: service_started
