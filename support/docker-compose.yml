@@ -147,5 +147,20 @@ services:
       - --retry-connrefused
       - http://sculptor:3000/
 
+  velorum:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/velorum:${RETICULUM_CONTAINER_VERSION}
+    networks:
+      - boot
+    volumes:
+      - ./config/velorum.models.configuration.json:/velorum/models.configuration.json
+    ports:
+      - "50052:50051"
+
+  velorum-offline:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/velorum:${RETICULUM_CONTAINER_VERSION}
+    network_mode: "none"
+    volumes:
+      - ./config/velorum.models.configuration.json:/velorum/models.configuration.json
+
 networks:
   boot:
