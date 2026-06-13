@@ -73,7 +73,7 @@ services:
       - http://sagittarius-rails-cable:3000/health/liveness
 
   nats:
-    image: nats:2.14.0
+    image: nats:2.14.1
     networks:
       - boot
     command:
