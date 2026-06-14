@@ -10,4 +10,6 @@ mkdir -p projects
 download_project aquila
 download_project draco
 download_project sagittarius
+download_project sculptor
 download_project taurus
+download_project velorum

@@ -110,6 +110,24 @@ services:
     profiles:
       - ide
 
+  velorum:
+    image: ${IMAGE_REGISTRY}/velorum:${IMAGE_TAG}
+    depends_on:
+      config-generator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    environment:
+      SECURITY_TOKEN: $VELORUM_JWT_SECRET
+    volumes:
+      - generated-configs:/tmp/generated-configs:ro
+    entrypoint: |
+      sh -c "
+        cp /tmp/generated-configs/velorum.models.configuration.json models.configuration.json
+        exec uv run main.py
+      "
+    profiles:
+      - ide_velorum
+
   nginx:
     image: nginx:1.31.0-alpine-slim
     depends_on:

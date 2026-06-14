@@ -1,0 +1,16 @@
+[
+<% find_envs(/VELORUM_MODEL_(\S+?)_.+/, group: true).each_with_index do |(_, envs), i| %>
+<%= ',' if i > 0 %>
+  {
+    "identifier": "<%= envs.fetch('IDENTIFIER', '') %>",
+    "name": "<%= envs.fetch('NAME', '') %>",
+    "capabilities": [
+      <%= envs.fetch('CAPABILITIES', '').split(',').map { |c| "\"#{c}\"" }.join(',') %>
+    ],
+    "provider": "<%= envs.fetch('PROVIDER', '') %>",
+    "api": "<%= envs.fetch('API', '') %>",
+    "auth": "<%= envs.fetch('AUTH', '') %>",
+    "token_cost": <%= envs.fetch('TOKEN_COST', '').to_f %>
+  }
+<% end %>
+]
