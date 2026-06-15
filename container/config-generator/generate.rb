@@ -83,6 +83,21 @@ class ConfigGenerator
   def env_set?(key)
     @env.fetch(key, nil) != nil
   end
+
+  def find_envs(pattern, group: false)
+    if group
+      @env.each_with_object({}) do |(key, value), groups|
+        match = key.match(pattern)
+        next unless match
+
+        group_key = match[1]
+        suffix = key.sub(/.*#{Regexp.escape(group_key)}_?/, '')
+        (groups[group_key] ||= {})[suffix] = value
+      end
+    else
+      @env.select { |key, _| key =~ pattern }
+    end
+  end
 end
 
 # Run the generator
