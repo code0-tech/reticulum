@@ -1,5 +1,5 @@
 upstream sagittarius_rails_web {
-  server <%= env('SAGITTARIUS_RAILS_HOST') %>:<%= env('SAGITTARIUS_RAILS_PORT') %>;
+  server <%= env!('SAGITTARIUS_RAILS_HOST') %>:<%= env!('SAGITTARIUS_RAILS_PORT') %>;
 }
 
 <% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
@@ -9,24 +9,24 @@ upstream sagittarius_cable {
 <% end %>
 
 upstream sagittarius_grpc {
-  server <%= env('SAGITTARIUS_GRPC_HOST') %>:<%= env('SAGITTARIUS_GRPC_PORT') %>;
+  server <%= env!('SAGITTARIUS_GRPC_HOST') %>:<%= env!('SAGITTARIUS_GRPC_PORT') %>;
 }
 
 upstream sculptor {
-  server <%= env('SCULPTOR_HOST') %>:<%= env('SCULPTOR_PORT') %>;
+  server <%= env!('SCULPTOR_HOST') %>:<%= env!('SCULPTOR_PORT') %>;
 }
 
 <% if env?('SSL_ENABLED') %>
 server {
   listen 80;
-  server_name <%= env('HOSTNAME') %>;
+  server_name <%= env!('HOSTNAME') %>;
 
   return 301 https://$host$request_uri;
 }
 
 server {
   listen 443 ssl http2;
-  server_name <%= env('HOSTNAME') %>;
+  server_name <%= env!('HOSTNAME') %>;
 
   ssl_certificate /etc/nginx/certs/<%= env('SSL_CERT_FILE', "#{env('HOSTNAME')}.pem") %>;
   ssl_certificate_key /etc/nginx/certs/<%= env('SSL_KEY_FILE', "#{env('HOSTNAME')}.key") %>;
@@ -39,7 +39,7 @@ server {
 <% else %>
 server {
   listen 80 http2;
-  server_name <%= env('HOSTNAME') %>;
+  server_name <%= env!('HOSTNAME') %>;
 <% end %>
 
   location = /graphql {
