@@ -3,21 +3,12 @@ require 'erb'
 require 'fileutils'
 
 class ConfigGenerator
-  REQUIRED_VARS = %w[
-    SAGITTARIUS_RAILS_HOST
-    SAGITTARIUS_RAILS_PORT
-    SAGITTARIUS_GRPC_HOST
-    SAGITTARIUS_GRPC_PORT
-    SCULPTOR_HOST
-    SCULPTOR_PORT
-    HOSTNAME
-  ]
   TEMPLATES_DIR = '/config-generator/templates'
   OUTPUT_DIR = '/generated-configs'
 
   def initialize
     @env = ENV.to_h
-    validate_env!
+    @missing_envs = []
   end
 
   def generate_all
@@ -34,18 +25,14 @@ class ConfigGenerator
       generate_from_template(template_path)
     end
 
+    if @missing_envs.any?
+      abort "ERROR: Missing required environment variables: #{@missing_envs.join(', ')}"
+    end
+
     puts "Configuration generation complete! Generated #{template_files.size} file(s)."
   end
 
   private
-
-  def validate_env!
-    missing = REQUIRED_VARS.reject { |var| @env[var] }
-
-    if missing.any?
-      abort "ERROR: Missing required environment variables: #{missing.join(', ')}"
-    end
-  end
 
   def generate_from_template(template_path)
     # Calculate relative path from templates directory
@@ -74,6 +61,14 @@ class ConfigGenerator
   # Helper methods for templates
   def env(key, default = nil)
     @env.fetch(key, default)
+  end
+
+  def env!(key)
+    result = @env.fetch(key, nil)
+
+    @missing_envs << key if result.nil?
+
+    result
   end
 
   def env?(key)
