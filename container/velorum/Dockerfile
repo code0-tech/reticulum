@@ -13,6 +13,7 @@ RUN uv sync --frozen
 COPY projects/velorum/src/model.py ./src/model.py
 RUN uv run python -c "from src.model import load_vector_model; load_vector_model()"
 
+COPY projects/velorum/few_shots.configuration.json ./few_shots.configuration.json
 COPY projects/velorum/cli ./cli
 COPY projects/velorum/src ./src
 COPY projects/velorum/main.py ./main.py
