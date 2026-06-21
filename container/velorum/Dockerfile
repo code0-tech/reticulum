@@ -2,7 +2,7 @@ ARG PYTHON_VERSION=3.12
 ARG UV_VERSION=0.11.16
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}-alpine
 
 COPY --from=uv /uv /uvx /usr/local/bin/
 
