@@ -117,7 +117,7 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
     environment:
-      SECURITY_TOKEN: $VELORUM_JWT_SECRET
+      SECURITY_TOKEN: ${VELORUM_JWT_SECRET}
     volumes:
       - generated-configs:/tmp/generated-configs:ro
       - ./velorum.few_shots_external.configuration.json:/velorum/few_shots_external.configuration.json:ro
@@ -180,6 +180,7 @@ services:
       GRPC_HOST: 0.0.0.0
       SAGITTARIUS_URL: "${AQUILA_SAGITTARIUS_URL}"
       RUNTIME_TOKEN: "${AQUILA_SAGITTARIUS_TOKEN}"
+      SAGITTARIUS_UNARY_RPC_TIMEOUT_SECS: "${SAGITTARIUS_UNARY_RPC_TIMEOUT_SECS}"
     volumes:
       - generated-configs:/tmp/generated-configs:ro
     entrypoint: |
@@ -202,6 +203,8 @@ services:
       NATS_URL: nats://nats:4222
       DEFINITION_PATH: '/definitions'
       AQUILA_TOKEN: "${TAURUS_AQUILA_TOKEN}"
+      AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
+      AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
     restart: unless-stopped
     profiles:
       - runtime
@@ -221,6 +224,8 @@ services:
       EXTERNAL_HTTP_SERVER_PORT: "${DRACO_REST_PORT}"
       EXTERNAL_HTTP_SERVER_HOST: "${DRACO_REST_HOST}"
       AQUILA_TOKEN: "${DRACO_REST_AQUILA_TOKEN}"
+      AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
+      AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
     ports:
       - "${DRACO_REST_PORT}:8084"
     restart: unless-stopped
@@ -238,6 +243,8 @@ services:
       NATS_BUCKET: 'flow_store'
       DEFINITION_PATH: '/definitions'
       AQUILA_TOKEN: "${DRACO_CRON_AQUILA_TOKEN}"
+      AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
+      AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
     restart: unless-stopped
     profiles:
       - runtime
