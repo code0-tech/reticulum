@@ -109,6 +109,7 @@ server {
     grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
     # Disable buffering for streaming
+    client_body_timeout 1h;
     grpc_read_timeout 1h;
     grpc_send_timeout 1h;
 
