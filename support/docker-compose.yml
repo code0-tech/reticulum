@@ -16,7 +16,7 @@ services:
       - ./config/sagittarius.yml:/sagittarius/config/sagittarius.yml
 
   curl-sagittarius-rails-web:
-    image: curlimages/curl:8.20.0
+    image: curlimages/curl:8.21.0
     networks:
       - boot
     command:
@@ -58,7 +58,7 @@ services:
       SAGITTARIUS_PREPARE_DATABASE: "true"
 
   curl-sagittarius-rails-cable:
-    image: curlimages/curl:8.20.0
+    image: curlimages/curl:8.21.0
     networks:
       - boot
     command:
@@ -133,7 +133,7 @@ services:
       - boot
 
   curl-sculptor:
-    image: curlimages/curl:8.20.0
+    image: curlimages/curl:8.21.0
     networks:
       - boot
     command:
