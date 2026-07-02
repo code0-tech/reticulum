@@ -8,6 +8,8 @@ rails:
   db:
     host: <%= env!('POSTGRES_HOST') %>
     port: <%= env!('POSTGRES_PORT') %>
+    username: <%= env!('POSTGRES_USER') %>
+    password: <%= env!('POSTGRES_PASSWORD') %>
     pool_size: <%= env('SAGITTARIUS_DB_POOL_SIZE', '8') %>
     encryption:
       primary_key: <%= env!('SAGITTARIUS_DB_ENCRYPTION_PRIMARY_KEY') %>
