@@ -12,5 +12,14 @@
       "identifier": "draco-cron",
       "token": "<%= env!('DRACO_CRON_AQUILA_TOKEN') %>"
     }
+  ],
+  "actions": [
+    <% find_envs(/AQUILA_ACTION_(\S+?)_.+/, group: true).each_with_index do |(_, envs), i| %>
+    <%= ',' if i > 0 %>
+    {
+      "identifier": "<%= envs.fetch('IDENTIFIER', '') %>",
+      "token": "<%= envs.fetch('TOKEN', '') %>"
+    }
+    <% end %>
   ]
 }
