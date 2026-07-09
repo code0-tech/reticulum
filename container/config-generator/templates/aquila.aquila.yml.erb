@@ -1,0 +1,51 @@
+# Deployment environment sent to connected services.
+# Valid values: development, staging, production.
+environment: <%= env('AQUILA_ENVIRONMENT', 'development') %>
+
+# Startup mode. Static loads flows from a local file; dynamic synchronizes with Sagittarius.
+# Valid values: static, dynamic.
+mode: <%= env('AQUILA_MODE', 'dynamic') %>
+
+# Default tracing filter. RUST_LOG takes precedence when it is set.
+log_level: <%= env('AQUILA_LOG_LEVEL', 'info') %>
+
+# NATS server and JetStream key-value bucket used for flow storage.
+nats:
+  url: <%= env('AQUILA_NATS_URL', 'nats://localhost:4222') %>
+  bucket: <%= env('AQUILA_NATS_BUCKET', 'flow_store') %>
+
+# Settings used only in static mode.
+static_config:
+  # JSON flow export loaded during startup.
+  flow_path: <%= env('AQUILA_STATIC_FLOW_PATH', './flowExport.json') %>
+
+# Settings used only in dynamic mode.
+dynamic_config:
+  # Sagittarius gRPC endpoint.
+  backend_url: <%= env!('AQUILA_BACKEND_URL') %>
+
+  # Authentication token for Sagittarius.
+  # AQUILA_BACKEND_TOKEN overrides this value and should be used for deployed secrets.
+  backend_token: <%= env!('AQUILA_BACKEND_TOKEN') %>
+
+  # Timeout for unary Sagittarius RPCs, in seconds.
+  backend_unary_timeout_secs: <%= env('AQUILA_BACKEND_UNARY_TIMEOUT_SECS', '5') %>
+
+# Aquila gRPC server bind settings.
+grpc:
+  host: <%= env('AQUILA_GRPC_HOST', '127.0.0.1') %>
+  port: <%= env('AQUILA_GRPC_PORT', '8081') %>
+
+  # Expose the standard gRPC health service.
+  health_service: <%= env('AQUILA_GRPC_HEALTH_SERVICE', 'false') %>
+
+# Runtime heartbeat state-transition timing, in seconds.
+runtime_status:
+  # Time without a heartbeat before a runtime becomes NOT_RESPONDING.
+  not_responding_after_secs: <%= env('AQUILA_RUNTIME_NOT_RESPONDING_AFTER_SECS', '90') %>
+
+  # Additional time in NOT_RESPONDING before a runtime becomes STOPPED.
+  stopped_after_not_responding_secs: <%= env('AQUILA_RUNTIME_STOPPED_AFTER_NOT_RESPONDING_SECS', '180') %>
+
+  # Frequency of runtime heartbeat checks.
+  monitor_interval_secs: <%= env('AQUILA_RUNTIME_MONITOR_INTERVAL_SECS', '30') %>

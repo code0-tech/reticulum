@@ -1,0 +1,25 @@
+environment: development
+mode: dynamic
+log_level: debug
+
+nats:
+  url: nats://nats:4222
+  bucket: flow_store
+
+static_config:
+  flow_path: ./flowExport.json
+
+dynamic_config:
+  backend_url: http://sagittarius-grpc:50051
+  backend_token: runtime_token
+  backend_unary_timeout_secs: 5
+
+grpc:
+  host: 0.0.0.0
+  port: 8081
+  health_service: true
+
+runtime_status:
+  not_responding_after_secs: 90
+  stopped_after_not_responding_secs: 180
+  monitor_interval_secs: 30

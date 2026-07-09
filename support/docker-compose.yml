@@ -83,15 +83,12 @@ services:
     image: ghcr.io/code0-tech/reticulum/ci-builds/aquila:${RETICULUM_CONTAINER_VERSION}
     networks:
       - boot
-    environment:
-      NATS_URL: nats://nats:4222
-      MODE: dynamic
-      WITH_HEALTH_SERVICE: "true"
-      GRPC_HOST: 0.0.0.0
-      SAGITTARIUS_URL: http://sagittarius-grpc:50051
-      RUNTIME_TOKEN: runtime_token
     volumes:
-      - ./config/aquila.service.configuration.json:/service.configuration.json
+      - ./config/aquila.yml:/aquila.yml
+      - ./config/aquila.service.configuration.json:/aquila.service.configuration.json
+    environment:
+      AQUILA_CONFIG_PATH: /aquila.yml
+      AQUILA_SERVICE_CONFIG_PATH: /aquila.service.configuration.json
     ports:
       - "8081:8081"
 
