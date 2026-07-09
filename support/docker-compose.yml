@@ -85,6 +85,10 @@ services:
       - boot
     volumes:
       - ./config/aquila.yml:/aquila.yml
+      - ./config/aquila.service.configuration.json:/aquila.service.configuration.json
+    environment:
+      AQUILA_CONFIG_PATH: /aquila.yml
+      AQUILA_SERVICE_CONFIG_PATH: /aquila.service.configuration.json
     ports:
       - "8081:8081"
 
