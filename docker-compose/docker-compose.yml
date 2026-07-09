@@ -178,11 +178,6 @@ services:
       AQUILA_SERVICE_CONFIG_PATH: /tmp/generated-configs/aquila.service.configuration.json
     volumes:
       - generated-configs:/tmp/generated-configs:ro
-    entrypoint: |
-      sh -c "
-        cp /tmp/generated-configs/aquila.aquila.yml /aquila.yml
-        exec /aquila
-      "
     restart: unless-stopped
     profiles:
       - runtime
