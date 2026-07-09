@@ -174,7 +174,7 @@ services:
         condition: service_started
     image: ${IMAGE_REGISTRY}/aquila:${IMAGE_TAG}
     environment:
-      AQUILA_CONFIG_PATH: /aquila.yml
+      AQUILA_CONFIG_PATH: /tmp/generated-configs/aquila.yml
       AQUILA_SERVICE_CONFIG_PATH: /tmp/generated-configs/aquila.service.configuration.json
     volumes:
       - generated-configs:/tmp/generated-configs:ro

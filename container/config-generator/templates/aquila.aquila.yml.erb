@@ -4,10 +4,10 @@ environment: <%= env('AQUILA_ENVIRONMENT', 'development') %>
 
 # Startup mode. Static loads flows from a local file; dynamic synchronizes with Sagittarius.
 # Valid values: static, dynamic.
-mode: <%= env('AQUILA_MODE', 'static') %>
+mode: <%= env('AQUILA_MODE', 'dynamic') %>
 
 # Default tracing filter. RUST_LOG takes precedence when it is set.
-log_level: <%= env('AQUILA_LOG_LEVEL', 'debug') %>
+log_level: <%= env('AQUILA_LOG_LEVEL', 'info') %>
 
 # NATS server and JetStream key-value bucket used for flow storage.
 nats:
@@ -22,11 +22,11 @@ static_config:
 # Settings used only in dynamic mode.
 dynamic_config:
   # Sagittarius gRPC endpoint.
-  backend_url: <%= env('AQUILA_BACKEND_URL', 'http://localhost:50051') %>
+  backend_url: <%= env!('AQUILA_BACKEND_URL') %>
 
   # Authentication token for Sagittarius.
   # AQUILA_BACKEND_TOKEN overrides this value and should be used for deployed secrets.
-  backend_token: <%= env('AQUILA_BACKEND_TOKEN', 'default_session_token') %>
+  backend_token: <%= env!('AQUILA_BACKEND_TOKEN') %>
 
   # Timeout for unary Sagittarius RPCs, in seconds.
   backend_unary_timeout_secs: <%= env('AQUILA_BACKEND_UNARY_TIMEOUT_SECS', '5') %>
