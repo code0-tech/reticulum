@@ -16,6 +16,12 @@ FROM alpine:3.23
 
 RUN apk --update add libc6-compat
 COPY --from=builder /taurus/target/release/taurus /taurus
-COPY --from=definitions /definitions/taurus /definitions/taurus
+COPY --from=definitions /definitions/taurus-boolean /definitions/taurus-boolean
+COPY --from=definitions /definitions/taurus-control /definitions/taurus-control
+COPY --from=definitions /definitions/taurus-http /definitions/taurus-http
+COPY --from=definitions /definitions/taurus-list /definitions/taurus-list
+COPY --from=definitions /definitions/taurus-number /definitions/taurus-number
+COPY --from=definitions /definitions/taurus-object /definitions/taurus-object
+COPY --from=definitions /definitions/taurus-text /definitions/taurus-text
 
 CMD ["/taurus"]
