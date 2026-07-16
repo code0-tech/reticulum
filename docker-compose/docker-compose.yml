@@ -40,13 +40,9 @@ services:
       INITIAL_ROOT_PASSWORD: ${INITIAL_ROOT_PASSWORD}
       INITIAL_ROOT_MAIL: ${INITIAL_ROOT_MAIL}
       INITIAL_RUNTIME_TOKEN: ${INITIAL_RUNTIME_TOKEN}
+      SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-web.yml
     volumes:
       - generated-configs:/tmp/generated-configs:ro
-    entrypoint: |
-      sh -c "
-        cp /tmp/generated-configs/sagittarius.sagittarius.yml config/sagittarius.yml
-        exec bin/docker-entrypoint ./bin/rails server
-      "
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:3000/health/liveness"]
@@ -63,11 +59,8 @@ services:
         condition: service_healthy
     volumes:
       - generated-configs:/tmp/generated-configs:ro
-    entrypoint: |
-      sh -c "
-        cp /tmp/generated-configs/sagittarius.sagittarius.yml config/sagittarius.yml
-        exec bin/docker-entrypoint bundle exec good_job
-      "
+    environment:
+      SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-background.yml
     restart: unless-stopped
     profiles:
       - ide
@@ -79,11 +72,8 @@ services:
         condition: service_healthy
     volumes:
       - generated-configs:/tmp/generated-configs:ro
-    entrypoint: |
-      sh -c "
-        cp /tmp/generated-configs/sagittarius.sagittarius.yml config/sagittarius.yml
-        exec bin/docker-entrypoint ./bin/grpc_server
-      "
+    environment:
+      SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-grpc.yml
     restart: unless-stopped
     profiles:
       - ide
@@ -95,11 +85,8 @@ services:
         condition: service_healthy
     volumes:
       - generated-configs:/tmp/generated-configs:ro
-    entrypoint: |
-      sh -c "
-        cp /tmp/generated-configs/sagittarius.sagittarius.yml config/sagittarius.yml
-        exec bin/docker-entrypoint bundle exec puma config.cable.ru
-      "
+    environment:
+      SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-cable.yml
     restart: unless-stopped
     profiles:
       - ide
