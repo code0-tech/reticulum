@@ -1,0 +1,4 @@
+<% if env?('OPENTELEMETRY_ENABLED') %>
+opentelemetry:
+  service_name: <%= env('OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_CABLE', 'sagittarius-cable') %>
+<% end %>
