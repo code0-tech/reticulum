@@ -61,6 +61,10 @@ services:
       - generated-configs:/tmp/generated-configs:ro
     environment:
       SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-background.yml
+    command:
+      - bundle
+      - exec
+      - good_job
     restart: unless-stopped
     profiles:
       - ide
@@ -74,6 +78,8 @@ services:
       - generated-configs:/tmp/generated-configs:ro
     environment:
       SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-grpc.yml
+    command:
+      - bin/grpc_server
     restart: unless-stopped
     profiles:
       - ide
@@ -87,6 +93,11 @@ services:
       - generated-configs:/tmp/generated-configs:ro
     environment:
       SAGITTARIUS_CONFIG_FILES: /tmp/generated-configs/sagittarius.sagittarius.yml,/tmp/generated-configs/sagittarius.sagittarius-cable.yml
+    command:
+      - bundle
+      - exec
+      - puma
+      - config.cable.ru
     restart: unless-stopped
     profiles:
       - ide
