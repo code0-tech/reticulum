@@ -42,6 +42,12 @@ server {
   server_name <%= env!('HOSTNAME') %>;
 <% end %>
 
+<% if env?('OPENTELEMETRY_ENABLED') -%>
+  otel_trace on;
+  otel_trace_context propagate;
+  otel_span_name "$request_method $request_uri";
+<% end -%>
+
   location = /graphql {
     proxy_pass http://sagittarius_rails_web;
     proxy_set_header Host $host;
