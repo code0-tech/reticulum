@@ -1,0 +1,10 @@
+<% if env?('OPENTELEMETRY_ENABLED') -%>
+otel_exporter {
+    endpoint <%= env!('OPENTELEMETRY_GRPC_HOST') %>;
+    interval 5s;
+    batch_size 512;
+    batch_count 4;
+}
+
+otel_service_name <%= env('OPENTELEMETRY_SERVICE_NAME_NGINX', 'nginx') %>;
+<% end -%>
