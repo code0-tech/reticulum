@@ -161,7 +161,7 @@ services:
       - ide
 
   nats:
-    image: nats:2.14.1
+    image: nats:2.14.3
     command:
       - -js
     restart: unless-stopped
