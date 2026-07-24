@@ -1,2 +1,5 @@
 # .erb is detected as HTML by default
 Dockerfile.erb linguist-language=Dockerfile
+*.yml.erb linguist-language=YAML
+nginx.*.conf.erb linguist-language=Nginx
+*.json.erb linguist-language=JSON
