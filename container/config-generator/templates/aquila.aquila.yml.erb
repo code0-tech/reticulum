@@ -49,3 +49,12 @@ runtime_status:
 
   # Frequency of runtime heartbeat checks.
   monitor_interval_secs: <%= env('AQUILA_RUNTIME_MONITOR_INTERVAL_SECS', '30') %>
+
+<% if env?('OPENTELEMETRY_ENABLED') %>
+opentelemetry:
+  enabled: true
+  service_name: <%= env('OPENTELEMETRY_SERVICE_NAME_AQUILA', 'aquila') %>
+  logs_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+  metrics_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+  traces_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+<% end %>
