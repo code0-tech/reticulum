@@ -11,6 +11,6 @@ ARG CODE0_CLI_VERSION=0.0.15
 RUN cargo install --version $CODE0_CLI_VERSION code0-cli
 
 # renovate: datasource=github-releases depName=code0-tech/code0-definition versioning=regex:^def-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$
-ARG DEFINITION_VERSION=def-0.0.32
+ARG DEFINITION_VERSION=def-0.0.33
 LABEL org.opencontainers.image.version=$DEFINITION_VERSION
 RUN code0-cli download -t $DEFINITION_VERSION
