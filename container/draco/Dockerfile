@@ -18,7 +18,7 @@ RUN cargo chef cook --release --recipe-path recipe.json --bin $VARIANT
 COPY projects/draco .
 RUN cargo build --release --bin $VARIANT
 
-FROM alpine:3.23
+FROM alpine:3.24
 ARG VARIANT
 
 RUN apk --update add libc6-compat
