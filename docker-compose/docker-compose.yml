@@ -84,6 +84,19 @@ services:
     profiles:
       - ide
 
+  sagittarius-gateway:
+    image: ${IMAGE_REGISTRY}/sagittarius-gateway:${IMAGE_TAG}
+    depends_on:
+      sagittarius-grpc:
+        condition: service_started
+    volumes:
+      - generated-configs:/tmp/generated-configs:ro
+    environment:
+      GATEWAY_CONFIG_PATH: /tmp/generated-configs/sagittarius-gateway.gateway.yml
+    restart: unless-stopped
+    profiles:
+      - ide
+
   sagittarius-rails-cable:
     image: ${IMAGE_REGISTRY}/sagittarius:${IMAGE_TAG}-${IMAGE_EDITION}
     depends_on:
@@ -136,7 +149,7 @@ services:
         condition: service_started
       sagittarius-rails-cable:
         condition: service_started
-      sagittarius-grpc:
+      sagittarius-gateway:
         condition: service_started
       sculptor:
         condition: service_started
