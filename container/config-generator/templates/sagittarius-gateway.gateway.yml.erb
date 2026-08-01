@@ -1,0 +1,24 @@
+environment: <%= env('SAGITTARIUS_GATEWAY_ENVIRONMENT', 'production') %>
+
+log_level: <%= env('SAGITTARIUS_GATEWAY_LOG_LEVEL', 'info') %>
+
+<% if env?('OPENTELEMETRY_ENABLED') %>
+opentelemetry:
+  enabled: true
+  service_name: <%= env('OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_GATEWAY', 'sagittarius-gateway') %>
+  logs_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+  metrics_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+  traces_endpoint: <%= env!('OPENTELEMETRY_GRPC_HOST') %>
+<% end %>
+
+backend:
+  url: "http://<%= env!('SAGITTARIUS_GRPC_HOST') %>:<%= env!('SAGITTARIUS_GRPC_PORT') %>"
+
+auth:
+  jwt_secret: <%= env!('SAGITTARIUS_GATEWAY_JWT_SECRET') %>
+  jwt_ttl_seconds: <%= env!('SAGITTARIUS_GATEWAY_JWT_TTL_SECONDS') %>
+
+grpc:
+  port: 50051
+  host: 0.0.0.0
+  with_health_service: <%= env('SAGITTARIUS_GATEWAY_GRPC_HEALTH_SERVICE', 'false') %>

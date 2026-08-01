@@ -73,6 +73,22 @@ container:boot:sagittarius:grpc:
   - >
     docker compose exec sagittarius-grpc bin/rails runner 'Runtime.create!(name: "Boot Test Runtime", token: "runtime_token")'
 
+container:boot:sagittarius:gateway:
+  extends:
+    - .container:boot
+  needs:
+    - generate-environment
+    - manifest:sagittarius
+    - manifest:sagittarius:gateway
+  variables:
+    SAGITTARIUS_VARIANT: ce
+  script:
+    - !reference [.container:boot:sagittarius-grpc-preparation]
+    - docker compose up sagittarius-gateway -d
+    - docker compose logs sagittarius-gateway -f &
+    - support/grpc_check_health --host docker:50052 --service liveness --retries 20
+    - support/grpc_check_health --host docker:50052 --service readiness --retries 20
+
 container:boot:aquila:
   extends:
     - .container:boot
@@ -80,11 +96,13 @@ container:boot:aquila:
     - generate-environment
     - manifest:aquila
     - manifest:sagittarius
+    - manifest:sagittarius:gateway
   variables:
     SAGITTARIUS_VARIANT: ce
   script:
     - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
+    - docker compose up sagittarius-gateway -d
     - docker compose up aquila -d
     - docker compose logs aquila -f &
     - support/grpc_check_health --host docker:8081 --service liveness --retries 20
@@ -97,12 +115,14 @@ container:boot:taurus:
     - generate-environment
     - manifest:aquila
     - manifest:sagittarius
+    - manifest:sagittarius:gateway
     - manifest:taurus
   variables:
     SAGITTARIUS_VARIANT: ce
   script:
     - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
+    - docker compose up sagittarius-gateway -d
     - docker compose up aquila -d
     - docker compose up taurus -d
     - docker compose logs taurus -f &
@@ -116,6 +136,7 @@ container:boot:draco:
     - generate-environment
     - manifest:aquila
     - manifest:sagittarius
+    - manifest:sagittarius:gateway
     - manifest:taurus
     - manifest:draco
   variables:
@@ -131,10 +152,11 @@ container:boot:draco:
   script:
     - !reference [.container:boot:sagittarius-grpc-preparation]
     - docker compose up nats -d
+    - docker compose up sagittarius-gateway -d
     - docker compose up aquila -d
     - docker compose up taurus -d
     - docker compose up draco -d
-    - docker compose logs draco -f &
+    - docker compose logs draco aquila sagittarius-gateway -f &
     - support/grpc_check_health --host docker:8083 --service liveness --retries 20
     - support/grpc_check_health --host docker:8083 --service readiness --retries 20
 

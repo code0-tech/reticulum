@@ -8,8 +8,8 @@ upstream sagittarius_cable {
 }
 <% end %>
 
-upstream sagittarius_grpc {
-  server <%= env!('SAGITTARIUS_GRPC_HOST') %>:<%= env!('SAGITTARIUS_GRPC_PORT') %>;
+upstream sagittarius_gateway {
+  server <%= env!('SAGITTARIUS_GATEWAY_HOST') %>:<%= env!('SAGITTARIUS_GATEWAY_PORT') %>;
 }
 
 upstream sculptor {
@@ -108,7 +108,7 @@ server {
 
   location / {
     if ($content_type = "application/grpc") {
-      grpc_pass grpc://sagittarius_grpc;
+      grpc_pass grpc://sagittarius_gateway;
       error_page 502 = /error502grpc;
     }
     grpc_set_header X-Real-IP $remote_addr;

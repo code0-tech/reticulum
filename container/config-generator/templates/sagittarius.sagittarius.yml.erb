@@ -4,6 +4,11 @@ rails:
     threads: <%= env('SAGITTARIUS_RAILS_WEB_THREADS', '3') %>
   grpc:
     threads: <%= env('SAGITTARIUS_RAILS_GRPC_THREADS', '6') %>
+    host: <%= env!('SAGITTARIUS_GRPC_HOST') %>:<%= env!('SAGITTARIUS_GRPC_PORT') %>
+  gateway:
+    host: <%= env!('SAGITTARIUS_GATEWAY_HOST') %>:<%= env!('SAGITTARIUS_GATEWAY_PORT') %>
+    jwt_secret: <%= env!('SAGITTARIUS_GATEWAY_JWT_SECRET') %>
+    jwt_ttl_seconds: <%= env!('SAGITTARIUS_GATEWAY_JWT_TTL_SECONDS') %>
   log_level: <%= env('SAGITTARIUS_LOG_LEVEL', 'info') %>
   db:
     host: <%= env!('POSTGRES_HOST') %>

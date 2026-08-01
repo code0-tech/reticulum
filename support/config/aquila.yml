@@ -10,7 +10,7 @@ static_config:
   flow_path: ./flowExport.json
 
 dynamic_config:
-  backend_url: http://sagittarius-grpc:50051
+  backend_url: http://sagittarius-gateway:50051
   backend_token: runtime_token
   backend_unary_timeout_secs: 5
 

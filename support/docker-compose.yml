@@ -72,6 +72,15 @@ services:
       - --retry-connrefused
       - http://sagittarius-rails-cable:3000/health/liveness
 
+  sagittarius-gateway:
+    image: ghcr.io/code0-tech/reticulum/ci-builds/sagittarius-gateway:${RETICULUM_CONTAINER_VERSION}
+    networks:
+      - boot
+    volumes:
+      - ./config/sagittarius-gateway.yml:/gateway.yml
+    ports:
+      - "50052:50051"
+
   nats:
     image: nats:2.14.1
     networks:

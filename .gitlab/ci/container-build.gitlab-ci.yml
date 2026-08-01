@@ -10,8 +10,9 @@
     - source support/helpers.sh
     - docker_login
     - docker_setup_builder
-    - 'image=$(echo "$CI_JOB_NAME" | cut -d : -f 2)'
-    - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $image'
+    - 'repository=$(echo "$CI_JOB_NAME" | sed "s/: \[.*\]$//" | cut -d : -f 2)'
+    - 'image=$(echo "$CI_JOB_NAME" | sed "s/: \[.*\]$//" | cut -d : -f 2- | tr : -)'
+    - '[ -z "$NEED_PROJECT_DOWNLOAD" ] || download_project $repository'
   retry:
     exit_codes:
       - 10 # when downloading project fails
@@ -275,6 +276,22 @@ manifest:sagittarius:
             PLATFORM:
               - amd64
               - arm64
+
+container:sagittarius:gateway:
+  extends:
+    - .single-image-build-base
+  needs:
+    - generate-environment
+    - manifest:rust
+  variables:
+    NEED_PROJECT_DOWNLOAD: 'true'
+
+manifest:sagittarius:gateway:
+  extends:
+    - .manifest-create-base
+  needs:
+    - generate-environment
+    - container:sagittarius:gateway
 
 container:node:
   extends:
