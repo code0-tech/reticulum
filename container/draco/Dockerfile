@@ -14,10 +14,10 @@ RUN cargo chef prepare --recipe-path recipe.json --bin $VARIANT
 FROM chef AS builder
 ARG VARIANT
 COPY --from=planner /draco/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json -p $VARIANT
+RUN cargo chef cook --release --recipe-path recipe.json --bin $VARIANT
 
 COPY projects/draco .
-RUN cargo build --release -p $VARIANT
+RUN cargo build --release --bin $VARIANT
 
 FROM alpine:3.23
 ARG VARIANT
