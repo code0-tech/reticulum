@@ -4,3 +4,7 @@ rails:
   db:
     host: postgres
     port: 5432
+  gateway:
+    host: sagittarius-gateway:50051
+    jwt_secret: "jwt-secret"
+    jwt_ttl_seconds: 300
