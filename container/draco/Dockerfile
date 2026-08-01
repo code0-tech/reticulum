@@ -3,7 +3,6 @@ ARG RETICULUM_IMAGE_TAG=local
 FROM ghcr.io/code0-tech/reticulum/ci-builds/definitions:$RETICULUM_IMAGE_TAG AS definitions
 
 FROM ghcr.io/code0-tech/reticulum/ci-builds/rust:$RETICULUM_IMAGE_TAG AS chef
-RUN cargo install cargo-chef --locked
 WORKDIR /draco
 
 FROM chef AS planner

@@ -1,7 +1,6 @@
 ARG RETICULUM_IMAGE_TAG=local
 
 FROM ghcr.io/code0-tech/reticulum/ci-builds/rust:$RETICULUM_IMAGE_TAG AS chef
-RUN cargo install cargo-chef --locked
 WORKDIR /aquila
 
 FROM chef AS planner
