@@ -216,40 +216,28 @@ services:
     profiles:
       - runtime
 
-  draco-rest:
+  rest-action:
     depends_on:
-      - nats
-    image: ${IMAGE_REGISTRY}/draco:${IMAGE_TAG}-rest
+      - aquila
+    image: ${ACTION_IMAGE_REGISTRY}/rest-action:${ACTION_IMAGE_TAG}
     environment:
-      MODE: dynamic
-      AQUILA_URL: 'http://aquila:8081'
-      NATS_URL: nats://nats:4222
-      NATS_BUCKET: 'flow_store'
+      HERCULES_AQUILA_URL: 'http://aquila:8081'
+      HERCULES_AUTH_TOKEN: "${AQUILA_ACTION_REST_TOKEN}"
       HTTP_SERVER_PORT: 8084
       HTTP_SERVER_HOST: "0.0.0.0"
-      EXTERNAL_HTTP_SERVER_PORT: "${DRACO_REST_PORT}"
-      EXTERNAL_HTTP_SERVER_HOST: "${DRACO_REST_HOST}"
-      AQUILA_TOKEN: "${DRACO_REST_AQUILA_TOKEN}"
-      AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
-      AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
     ports:
-      - "${DRACO_REST_PORT}:8084"
+      - "${REST_ACTION_PORT}:8084"
     restart: unless-stopped
     profiles:
       - runtime
 
-  draco-cron:
+  cron-action:
     depends_on:
-      - nats
-    image: ${IMAGE_REGISTRY}/draco:${IMAGE_TAG}-cron
+      - aquila
+    image: ${ACTION_IMAGE_REGISTRY}/cron-action:${ACTION_IMAGE_TAG}
     environment:
-      MODE: dynamic
-      AQUILA_URL: 'http://aquila:8081'
-      NATS_URL: nats://nats:4222
-      NATS_BUCKET: 'flow_store'
-      AQUILA_TOKEN: "${DRACO_CRON_AQUILA_TOKEN}"
-      AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
-      AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
+      HERCULES_AQUILA_URL: 'http://aquila:8081'
+      HERCULES_AUTH_TOKEN: "${AQUILA_ACTION_CRON_TOKEN}"
     restart: unless-stopped
     profiles:
       - runtime
