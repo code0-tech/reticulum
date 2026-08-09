@@ -1,7 +1,5 @@
 ARG RETICULUM_IMAGE_TAG=local
 
-FROM ghcr.io/code0-tech/reticulum/ci-builds/definitions:$RETICULUM_IMAGE_TAG AS definitions
-
 FROM ghcr.io/code0-tech/reticulum/ci-builds/rust:$RETICULUM_IMAGE_TAG AS chef
 WORKDIR /draco
 
@@ -23,6 +21,5 @@ ARG VARIANT
 
 RUN apk --update add libc6-compat
 COPY --from=builder /draco/target/release/$VARIANT /draco
-COPY --from=definitions /definitions/draco-$VARIANT /definitions/draco-$VARIANT
 
 CMD ["/draco"]
