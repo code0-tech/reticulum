@@ -129,37 +129,6 @@ container:boot:taurus:
     - support/grpc_check_health --host docker:8082 --service liveness --retries 20
     - support/grpc_check_health --host docker:8082 --service readiness --retries 20
 
-container:boot:draco:
-  extends:
-    - .container:boot
-  needs:
-    - generate-environment
-    - manifest:aquila
-    - manifest:sagittarius
-    - manifest:sagittarius:gateway
-    - manifest:taurus
-    - manifest:draco
-  variables:
-    SAGITTARIUS_VARIANT: ce
-  parallel:
-    matrix:
-      - DRACO_VARIANT:
-          - rest
-          - cron
-        PLATFORM:
-          - amd64
-          - arm64
-  script:
-    - !reference [.container:boot:sagittarius-grpc-preparation]
-    - docker compose up nats -d
-    - docker compose up sagittarius-gateway -d
-    - docker compose up aquila -d
-    - docker compose up taurus -d
-    - docker compose up draco -d
-    - docker compose logs draco aquila sagittarius-gateway -f &
-    - support/grpc_check_health --host docker:8083 --service liveness --retries 20
-    - support/grpc_check_health --host docker:8083 --service readiness --retries 20
-
 container:boot:sculptor:
   extends:
     - .container:boot
