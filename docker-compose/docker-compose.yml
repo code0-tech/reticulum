@@ -209,7 +209,6 @@ services:
       MODE: dynamic
       AQUILA_URL: 'http://aquila:8081'
       NATS_URL: nats://nats:4222
-      DEFINITION_PATH: '/definitions'
       AQUILA_TOKEN: "${TAURUS_AQUILA_TOKEN}"
       AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
       AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
@@ -226,7 +225,6 @@ services:
       AQUILA_URL: 'http://aquila:8081'
       NATS_URL: nats://nats:4222
       NATS_BUCKET: 'flow_store'
-      DEFINITION_PATH: '/definitions'
       HTTP_SERVER_PORT: 8084
       HTTP_SERVER_HOST: "0.0.0.0"
       EXTERNAL_HTTP_SERVER_PORT: "${DRACO_REST_PORT}"
@@ -249,7 +247,6 @@ services:
       AQUILA_URL: 'http://aquila:8081'
       NATS_URL: nats://nats:4222
       NATS_BUCKET: 'flow_store'
-      DEFINITION_PATH: '/definitions'
       AQUILA_TOKEN: "${DRACO_CRON_AQUILA_TOKEN}"
       AQUILA_GRPC_CONNECT_TIMEOUT_SECS: "${AQUILA_GRPC_CONNECT_TIMEOUT_SECS}"
       AQUILA_GRPC_REQUEST_TIMEOUT_SECS: "${AQUILA_GRPC_REQUEST_TIMEOUT_SECS}"
