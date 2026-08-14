@@ -1,6 +1,6 @@
 ARG RETICULUM_IMAGE_TAG=local
 
-FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG
+FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG AS build
 
 WORKDIR /sculptor
 
@@ -39,5 +39,12 @@ ARG RETICULUM_IMAGE_TAG=local
 RUN npm version --git-tag-version=false $RETICULUM_IMAGE_TAG
 
 RUN npm run build
+
+FROM ghcr.io/code0-tech/reticulum/ci-builds/node:$RETICULUM_IMAGE_TAG
+
+WORKDIR /sculptor
+
+COPY --from=build /sculptor/package.json package.json
+COPY --from=build /sculptor/.next/standalone .next/standalone
 
 ENTRYPOINT ["npm", "run", "start"]
