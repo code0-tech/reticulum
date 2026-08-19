@@ -156,6 +156,15 @@ container:boot:velorum:
   needs:
     - generate-environment
     - manifest:velorum
+  parallel:
+    matrix:
+      - VELORUM_VARIANT:
+          - ce
+          - ee
+          - cloud
+        PLATFORM:
+          - amd64
+          - arm64
   script:
     - bundle install
     - docker compose up velorum -d
@@ -169,6 +178,15 @@ container:boot:velorum:offline:
   needs:
     - generate-environment
     - manifest:velorum
+  parallel:
+    matrix:
+      - VELORUM_VARIANT:
+          - ce
+          - ee
+          - cloud
+        PLATFORM:
+          - amd64
+          - arm64
   script:
     - docker compose up velorum-offline -d
     - docker compose logs velorum-offline -f &
