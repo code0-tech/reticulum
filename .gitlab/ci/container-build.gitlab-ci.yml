@@ -297,15 +297,36 @@ manifest:sculptor:
 
 container:velorum:
   extends:
-    - .single-image-build-base
+    - .variant-image-build-base
   needs:
     - generate-environment
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+          - cloud
+        PLATFORM:
+          - amd64
+          - arm64
 
 manifest:velorum:
   extends:
     - .manifest-create-base
+  parallel:
+    matrix:
+      - VARIANT:
+          - ce
+          - ee
+          - cloud
   needs:
     - generate-environment
-    - container:velorum
+    - job: container:velorum
+      parallel:
+        matrix:
+          - VARIANT: [ '$[[ matrix.VARIANT ]]' ]
+            PLATFORM:
+              - amd64
+              - arm64

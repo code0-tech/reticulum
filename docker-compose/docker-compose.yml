@@ -141,7 +141,7 @@ services:
       - ide
 
   velorum:
-    image: ${IMAGE_REGISTRY}/velorum:${IMAGE_TAG}
+    image: ${IMAGE_REGISTRY}/velorum:${IMAGE_TAG}-${IMAGE_EDITION}
     depends_on:
       config-generator:
         condition: service_completed_successfully

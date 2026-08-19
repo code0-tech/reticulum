@@ -16,6 +16,16 @@ RUN uv run python -c "from src.model import load_vector_model; load_vector_model
 COPY projects/velorum/few_shots.configuration.json ./few_shots.configuration.json
 COPY projects/velorum/cli ./cli
 COPY projects/velorum/src ./src
+
+<% if ee? || cloud? %>
+COPY projects/velorum/packages/ee ./packages/ee
+<% end %>
+
+<% if cloud? %>
+COPY projects/velorum/packages/cloud ./packages/cloud
+<% end %>
+
+COPY projects/velorum/edition.py ./edition.py
 COPY projects/velorum/main.py ./main.py
 
 ENV HF_HUB_OFFLINE=1

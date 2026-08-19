@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require 'erb'
+require 'fileutils'
+
+def ee?
+  ENV['VARIANT'].eql?('ee')
+end
+
+def cloud?
+  ENV['VARIANT'].eql?('cloud')
+end
+
+def variant
+  ENV['VARIANT']
+end
+
+template = ERB.new(File.read("#{__dir__}/Dockerfile.erb"), trim_mode: '-')
+File.write("#{__dir__}/Dockerfile", template.result)
