@@ -1,0 +1,6 @@
+services:
+  aquila:
+    environment:
+      AQUILA_SERVICE_CONFIG_PATH: /codezero/service.configuration.json
+    volumes:
+      - ./service.configuration.json:/codezero/service.configuration.json:ro
