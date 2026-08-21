@@ -116,6 +116,7 @@
   "templates": [
     { "template": ".env", "output": ".env" },
     { "template": "docker-compose.yml", "output": "docker-compose.yml" },
-    { "template": "service.configuration.json.tera", "output": "service.configuration.json" }
+    { "template": "service.configuration.json.tera", "output": "service.configuration.json" },
+    { "template": "docker-compose.override.yml", "output": "docker-compose.override.yml", "required": false }
   ]
 }
