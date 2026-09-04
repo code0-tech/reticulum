@@ -82,7 +82,7 @@ services:
       - "50052:50051"
 
   nats:
-    image: nats:2.14.4
+    image: nats:2.14.6
     networks:
       - boot
     command:
