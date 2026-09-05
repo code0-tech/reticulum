@@ -160,7 +160,7 @@ services:
       - ide_velorum
 
   nginx:
-    image: nginx:1.31.3-alpine-otel
+    image: nginx:1.31.4-alpine-otel
     depends_on:
       config-generator:
         condition: service_completed_successfully
