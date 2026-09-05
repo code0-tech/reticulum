@@ -1,5 +1,10 @@
-resource "docker_image" "config_generator" {
+data "docker_registry_image" "config_generator" {
   name = "${var.image_registry}/config-generator:${var.image_tag}"
+}
+
+resource "docker_image" "config_generator" {
+  name          = data.docker_registry_image.config_generator.name
+  pull_triggers = [data.docker_registry_image.config_generator.sha256_digest]
 }
 
 resource "docker_container" "config_generator" {
@@ -17,5 +22,6 @@ resource "docker_container" "config_generator" {
 
   env = local.config_generator_env
 
-  restart = "no"
+  restart  = "no"
+  must_run = false
 }

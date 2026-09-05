@@ -1,10 +1,19 @@
+data "docker_registry_image" "sculptor" {
+  count = local.ide_enabled ? 1 : 0
+  name  = "${var.image_registry}/sculptor:${var.image_tag}-${var.image_edition}"
+}
+
 resource "docker_image" "sculptor" {
-  name = "${var.image_registry}/sculptor:${var.image_tag}-${var.image_edition}"
+  count         = local.ide_enabled ? 1 : 0
+  name          = data.docker_registry_image.sculptor[0].name
+  pull_triggers = [data.docker_registry_image.sculptor[0].sha256_digest]
 }
 
 resource "docker_container" "sculptor" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-sculptor"
-  image = docker_image.sculptor.image_id
+  image = docker_image.sculptor[0].image_id
 
   networks_advanced {
     name = docker_network.default.name
@@ -22,7 +31,7 @@ resource "docker_container" "sculptor" {
     "NEXT_PUBLIC_OTEL_TRACES_ENDPOINT=${var.otel_traces_clientside_http_endpoint}",
   ]
 
-    entrypoint = [
+  entrypoint = [
     "sh", "-c",
     <<-EOT
       if [ "$OPENTELEMETRY_ENABLED" != 'true' ]; then

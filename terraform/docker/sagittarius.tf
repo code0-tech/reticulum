@@ -1,10 +1,19 @@
+data "docker_registry_image" "sagittarius" {
+  count = local.ide_enabled ? 1 : 0
+  name  = "${var.image_registry}/sagittarius:${var.image_tag}-${var.image_edition}"
+}
+
 resource "docker_image" "sagittarius" {
-  name = "${var.image_registry}/sagittarius:${var.image_tag}-${var.image_edition}"
+  count         = local.ide_enabled ? 1 : 0
+  name          = data.docker_registry_image.sagittarius[0].name
+  pull_triggers = [data.docker_registry_image.sagittarius[0].sha256_digest]
 }
 
 resource "docker_container" "sagittarius_rails_web" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-sagittarius-rails-web"
-  image = docker_image.sagittarius.image_id
+  image = docker_image.sagittarius[0].image_id
 
   depends_on = [
     docker_container.config_generator,
@@ -42,8 +51,10 @@ resource "docker_container" "sagittarius_rails_web" {
 }
 
 resource "docker_container" "sagittarius_rails_background" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-sagittarius-rails-background"
-  image = docker_image.sagittarius.image_id
+  image = docker_image.sagittarius[0].image_id
 
   depends_on = [
     docker_container.config_generator,
@@ -72,8 +83,10 @@ resource "docker_container" "sagittarius_rails_background" {
 }
 
 resource "docker_container" "sagittarius_grpc" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-sagittarius-grpc"
-  image = docker_image.sagittarius.image_id
+  image = docker_image.sagittarius[0].image_id
 
   depends_on = [
     docker_container.config_generator,
@@ -102,8 +115,10 @@ resource "docker_container" "sagittarius_grpc" {
 }
 
 resource "docker_container" "sagittarius_rails_cable" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-sagittarius-rails-cable"
-  image = docker_image.sagittarius.image_id
+  image = docker_image.sagittarius[0].image_id
 
   depends_on = [
     docker_container.config_generator,

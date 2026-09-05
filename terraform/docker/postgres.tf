@@ -1,10 +1,19 @@
+data "docker_registry_image" "postgres" {
+  count = local.ide_enabled ? 1 : 0
+  name  = "postgres:18.3"
+}
+
 resource "docker_image" "postgres" {
-  name = "postgres:18.3"
+  count         = local.ide_enabled ? 1 : 0
+  name          = data.docker_registry_image.postgres[0].name
+  pull_triggers = [data.docker_registry_image.postgres[0].sha256_digest]
 }
 
 resource "docker_container" "postgres" {
+  count = local.ide_enabled ? 1 : 0
+
   name  = "${var.project_name}-postgres"
-  image = docker_image.postgres.image_id
+  image = docker_image.postgres[0].image_id
 
   networks_advanced {
     name = docker_network.default.name
@@ -17,7 +26,7 @@ resource "docker_container" "postgres" {
   ]
 
   volumes {
-    volume_name    = docker_volume.postgres_data.name
+    volume_name    = docker_volume.postgres_data[0].name
     container_path = "/var/lib/postgresql"
   }
 

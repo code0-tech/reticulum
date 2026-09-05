@@ -1,10 +1,16 @@
-resource "docker_image" "velorum" {
-  count = var.enable_velorum ? 1 : 0
+data "docker_registry_image" "velorum" {
+  count = local.velorum_enabled ? 1 : 0
   name  = "${var.image_registry}/velorum:${var.image_tag}-${var.image_edition}"
 }
 
+resource "docker_image" "velorum" {
+  count         = local.velorum_enabled ? 1 : 0
+  name          = data.docker_registry_image.velorum[0].name
+  pull_triggers = [data.docker_registry_image.velorum[0].sha256_digest]
+}
+
 resource "docker_container" "velorum" {
-  count = var.enable_velorum ? 1 : 0
+  count = local.velorum_enabled ? 1 : 0
 
   name  = "${var.project_name}-velorum"
   image = docker_image.velorum[0].image_id
@@ -20,8 +26,8 @@ resource "docker_container" "velorum" {
   ]
 
   upload {
-    file     = "/velorum/few_shots_external.configuration.json"
-    content  = var.few_shots_external_config_path
+    file    = "/velorum/few_shots_external.configuration.json"
+    content = var.few_shots_external_config_path
   }
 
   volumes {

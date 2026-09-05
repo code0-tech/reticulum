@@ -1,10 +1,19 @@
+data "docker_registry_image" "aquila" {
+  count = local.runtime_enabled ? 1 : 0
+  name  = "${var.image_registry}/aquila:${var.image_tag}"
+}
+
 resource "docker_image" "aquila" {
-  name = "${var.image_registry}/aquila:${var.image_tag}"
+  count         = local.runtime_enabled ? 1 : 0
+  name          = data.docker_registry_image.aquila[0].name
+  pull_triggers = [data.docker_registry_image.aquila[0].sha256_digest]
 }
 
 resource "docker_container" "aquila" {
+  count = local.runtime_enabled ? 1 : 0
+
   name  = "${var.project_name}-aquila"
-  image = docker_image.aquila.image_id
+  image = docker_image.aquila[0].image_id
 
   depends_on = [
     docker_container.config_generator,
@@ -16,7 +25,7 @@ resource "docker_container" "aquila" {
   }
 
   networks_advanced {
-    name = docker_network.aquila.name
+    name = docker_network.aquila[0].name
   }
 
   env = [
