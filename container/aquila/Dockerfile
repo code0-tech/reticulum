@@ -14,7 +14,7 @@ RUN cargo chef cook --release --recipe-path recipe.json
 COPY projects/aquila .
 RUN cargo build --release
 
-FROM alpine:3.23
+FROM alpine:3.24
 
 RUN apk --update add libc6-compat
 COPY --from=builder /aquila/target/release/aquila .
