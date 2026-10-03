@@ -19,7 +19,7 @@ COPY projects/sagittarius/gateway gateway
 
 RUN cargo build --release
 
-FROM alpine:3.23
+FROM alpine:3.24
 
 RUN apk --update add libc6-compat
 COPY --from=builder /sagittarius/target/release/gateway .
