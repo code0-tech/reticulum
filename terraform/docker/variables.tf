@@ -263,6 +263,16 @@ variable "velorum_models" {
   default = {}
 }
 
+variable "additional_sagittarius_config" {
+  description = <<-EOT
+    Additional configuration for sagittarius.
+    Will override any other configuration variables or defaults.
+    Must be valid YAML.
+  EOT
+  type = string
+  default = null
+}
+
 locals {
   ide_enabled     = contains(var.enabled_profiles, "ide")
   runtime_enabled = contains(var.enabled_profiles, "runtime")

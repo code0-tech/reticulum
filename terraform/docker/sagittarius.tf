@@ -28,11 +28,20 @@ resource "docker_container" "sagittarius_rails_web" {
     "INITIAL_ROOT_PASSWORD=${var.initial_root_password}",
     "INITIAL_ROOT_MAIL=${var.initial_root_mail}",
     "INITIAL_RUNTIME_TOKEN=${random_password.initial_runtime_token.result}",
-    "SAGITTARIUS_CONFIG_FILES=${join(",", [
+    "SAGITTARIUS_CONFIG_FILES=${join(",", compact([
       "/tmp/generated-configs/sagittarius.sagittarius.yml",
       "/tmp/generated-configs/sagittarius.sagittarius-web.yml",
-    ])}",
+      var.additional_sagittarius_config != null ? "/tmp/sagittarius.terraform-additional.yml" : null
+    ]))}",
   ]
+
+  dynamic "upload" {
+    for_each = var.additional_sagittarius_config != null ? [1] : []
+    content {
+      file = "/tmp/sagittarius.terraform-additional.yml"
+      content = var.additional_sagittarius_config
+    }
+  }
 
   volumes {
     volume_name    = docker_volume.generated_configs.name
@@ -66,11 +75,20 @@ resource "docker_container" "sagittarius_rails_background" {
   }
 
   env = [
-    "SAGITTARIUS_CONFIG_FILES=${join(",", [
+    "SAGITTARIUS_CONFIG_FILES=${join(",", compact([
       "/tmp/generated-configs/sagittarius.sagittarius.yml",
       "/tmp/generated-configs/sagittarius.sagittarius-background.yml",
-    ])}",
+      var.additional_sagittarius_config != null ? "/tmp/sagittarius.terraform-additional.yml" : null
+    ]))}",
   ]
+
+  dynamic "upload" {
+    for_each = var.additional_sagittarius_config != null ? [1] : []
+    content {
+      file = "/tmp/sagittarius.terraform-additional.yml"
+      content = var.additional_sagittarius_config
+    }
+  }
 
   volumes {
     volume_name    = docker_volume.generated_configs.name
@@ -98,11 +116,20 @@ resource "docker_container" "sagittarius_grpc" {
   }
 
   env = [
-    "SAGITTARIUS_CONFIG_FILES=${join(",", [
+    "SAGITTARIUS_CONFIG_FILES=${join(",", compact([
       "/tmp/generated-configs/sagittarius.sagittarius.yml",
       "/tmp/generated-configs/sagittarius.sagittarius-grpc.yml",
-    ])}",
+      var.additional_sagittarius_config != null ? "/tmp/sagittarius.terraform-additional.yml" : null
+    ]))}",
   ]
+
+  dynamic "upload" {
+    for_each = var.additional_sagittarius_config != null ? [1] : []
+    content {
+      file = "/tmp/sagittarius.terraform-additional.yml"
+      content = var.additional_sagittarius_config
+    }
+  }
 
   volumes {
     volume_name    = docker_volume.generated_configs.name
@@ -130,11 +157,20 @@ resource "docker_container" "sagittarius_rails_cable" {
   }
 
   env = [
-    "SAGITTARIUS_CONFIG_FILES=${join(",", [
+    "SAGITTARIUS_CONFIG_FILES=${join(",", compact([
       "/tmp/generated-configs/sagittarius.sagittarius.yml",
       "/tmp/generated-configs/sagittarius.sagittarius-cable.yml",
-    ])}",
+      var.additional_sagittarius_config != null ? "/tmp/sagittarius.terraform-additional.yml" : null
+    ]))}",
   ]
+
+  dynamic "upload" {
+    for_each = var.additional_sagittarius_config != null ? [1] : []
+    content {
+      file = "/tmp/sagittarius.terraform-additional.yml"
+      content = var.additional_sagittarius_config
+    }
+  }
 
   volumes {
     volume_name    = docker_volume.generated_configs.name
