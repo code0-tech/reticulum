@@ -19,7 +19,7 @@ resource "docker_container" "sculptor" {
     name = docker_network.default.name
   }
 
-  env = [
+  env = concat([
     "OPENTELEMETRY_ENABLED=${var.opentelemetry_enabled}",
     "OTEL_SERVICE_NAME=${var.otel_service_name_sculptor}",
     "OTEL_LOGS_ENDPOINT=${var.otel_logs_http_endpoint}",
@@ -29,7 +29,7 @@ resource "docker_container" "sculptor" {
     "NEXT_PUBLIC_OTEL_LOGS_ENDPOINT=${var.otel_logs_clientside_http_endpoint}",
     "NEXT_PUBLIC_OTEL_METRICS_ENDPOINT=${var.otel_metrics_clientside_http_endpoint}",
     "NEXT_PUBLIC_OTEL_TRACES_ENDPOINT=${var.otel_traces_clientside_http_endpoint}",
-  ]
+  ], var.sculptor_env)
 
   entrypoint = [
     "sh", "-c",

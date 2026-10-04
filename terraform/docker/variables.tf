@@ -263,6 +263,15 @@ variable "velorum_models" {
   default = {}
 }
 
+variable "sculptor_env" {
+  description = <<-EOT
+    Additional environment variables to set on the sculptor container.
+    Empty by default.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
 variable "additional_sagittarius_config" {
   description = <<-EOT
     Additional configuration for sagittarius.
