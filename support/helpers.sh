@@ -15,9 +15,13 @@ function docker_login() {
 
 function docker_setup_builder() {
   docker context create build-context
+  # Pin BuildKit to v0.33.0. v0.33.1 changed image source cache keys to bind to
+  # the verified base image descriptor instead of DiffIDs,
+  # which breaks caching of derived images whose base index digest churns every pipeline.
   docker buildx create \
     --name container-builder \
     --driver docker-container \
+    --driver-opt image=moby/buildkit:v0.33.0 \
     --bootstrap \
     --use \
     build-context
