@@ -38,7 +38,10 @@ function build_image() {
 
   build_args+=" --label org.opencontainers.image.source=https://github.com/code0-tech/reticulum"
 
-  if [[ -n "$CI_PIPELINE_ID" ]]; then
+  # Since BuildKit 0.33.1 a label on the image invalidates the cache.
+  # We keep them on the index, but the individual images can only carry
+  # them if no other image uses it as a base.
+  if [[ -n "$CI_PIPELINE_ID" && "$LABEL_PIPELINE_ID" == "true" ]]; then
     build_args+=" --label tech.code0.reticulum.pipeline.id=$CI_PIPELINE_ID"
   fi
 

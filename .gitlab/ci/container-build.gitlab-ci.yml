@@ -6,6 +6,8 @@
     - c0-$PLATFORM
   image: ghcr.io/code0-tech/build-images/reticulum-builder:227.1-ruby-3.4.7-$PLATFORM
   stage: container
+  variables:
+    LABEL_PIPELINE_ID: 'false'
   before_script:
     - source support/helpers.sh
     - docker_login
@@ -124,6 +126,7 @@ container:aquila:
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
 
 manifest:aquila:
   extends:
@@ -140,6 +143,7 @@ container:taurus:
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
 
 manifest:taurus:
   extends:
@@ -168,6 +172,8 @@ container:config-generator:
   needs:
     - generate-environment
     - manifest:ruby
+  variables:
+    LABEL_PIPELINE_ID: 'true'
 
 manifest:config-generator:
   extends:
@@ -199,6 +205,7 @@ container:sagittarius:
     - manifest:postgresql
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
   parallel:
     matrix:
       - VARIANT:
@@ -236,6 +243,7 @@ container:sagittarius:gateway:
     - manifest:rust
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
 
 manifest:sagittarius:gateway:
   extends:
@@ -266,6 +274,7 @@ container:sculptor:
     - manifest:node
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
   parallel:
     matrix:
       - VARIANT:
@@ -302,6 +311,7 @@ container:velorum:
     - generate-environment
   variables:
     NEED_PROJECT_DOWNLOAD: 'true'
+    LABEL_PIPELINE_ID: 'true'
   parallel:
     matrix:
       - VARIANT:
