@@ -1,21 +1,3 @@
-upstream sagittarius_rails_web {
-  server <%= env!('SAGITTARIUS_RAILS_HOST') %>:<%= env!('SAGITTARIUS_RAILS_PORT') %>;
-}
-
-<% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
-upstream sagittarius_cable {
-  server <%= env('SAGITTARIUS_CABLE_HOST') %>:<%= env('SAGITTARIUS_CABLE_PORT') %>;
-}
-<% end %>
-
-upstream sagittarius_gateway {
-  server <%= env!('SAGITTARIUS_GATEWAY_HOST') %>:<%= env!('SAGITTARIUS_GATEWAY_PORT') %>;
-}
-
-upstream sculptor {
-  server <%= env!('SCULPTOR_HOST') %>:<%= env!('SCULPTOR_PORT') %>;
-}
-
 <% if env?('SSL_ENABLED') %>
 server {
   listen 80;
@@ -42,6 +24,20 @@ server {
   server_name <%= env!('HOSTNAME') %>;
 <% end %>
 
+  # Embedded Docker DNS to avoid cached IP resolutions after container recreations
+  resolver 127.0.0.11 valid=10s ipv6=off;
+
+  # Variables to force DNS resolution during runtime rather than startup
+  set $upstream_rails_web "<%= env!('SAGITTARIUS_RAILS_HOST') %>:<%= env!('SAGITTARIUS_RAILS_PORT') %>";
+<% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
+  set $upstream_cable "<%= env('SAGITTARIUS_CABLE_HOST') %>:<%= env('SAGITTARIUS_CABLE_PORT') %>";
+<% else %>
+  set $upstream_cable "<%= env!('SAGITTARIUS_RAILS_HOST') %>:<%= env!('SAGITTARIUS_RAILS_PORT') %>";
+<% end %>
+  set $upstream_gateway "<%= env!('SAGITTARIUS_GATEWAY_HOST') %>:<%= env!('SAGITTARIUS_GATEWAY_PORT') %>";
+  set $upstream_sculptor "<%= env!('SCULPTOR_HOST') %>:<%= env!('SCULPTOR_PORT') %>";
+
+
 <% if env?('OPENTELEMETRY_ENABLED') -%>
   otel_trace on;
   otel_trace_context propagate;
@@ -49,7 +45,7 @@ server {
 <% end -%>
 
   location = /graphql {
-    proxy_pass http://sagittarius_rails_web;
+    proxy_pass http://$upstream_rails_web$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -57,7 +53,7 @@ server {
   }
 
   location = /files/upload {
-    proxy_pass http://sagittarius_rails_web;
+    proxy_pass http://$upstream_rails_web$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -68,7 +64,7 @@ server {
   }
 
   location = /health/liveness {
-    proxy_pass http://sagittarius_rails_web;
+    proxy_pass http://$upstream_rails_web$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -76,7 +72,7 @@ server {
   }
 
   location /good_job {
-    proxy_pass http://sagittarius_rails_web;
+    proxy_pass http://$upstream_rails_web$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -84,11 +80,7 @@ server {
   }
 
   location = /cable {
-<% if env_set?('SAGITTARIUS_CABLE_HOST') && env_set?('SAGITTARIUS_CABLE_PORT') %>
-    proxy_pass http://sagittarius_cable;
-<% else %>
-    proxy_pass http://sagittarius_rails_web;
-<% end %>
+    proxy_pass http://$upstream_cable$request_uri;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -108,7 +100,7 @@ server {
 
   location / {
     if ($content_type = "application/grpc") {
-      grpc_pass grpc://sagittarius_gateway;
+      grpc_pass grpc://$upstream_gateway;
       error_page 502 = /error502grpc;
     }
     grpc_set_header X-Real-IP $remote_addr;
@@ -122,7 +114,7 @@ server {
     # Keep connection alive for long-running streams
     grpc_socket_keepalive on;
 
-    proxy_pass http://sculptor;
+    proxy_pass http://$upstream_sculptor$request_uri;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
