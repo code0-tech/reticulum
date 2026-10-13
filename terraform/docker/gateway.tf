@@ -35,4 +35,10 @@ resource "docker_container" "sagittarius_gateway" {
   }
 
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }

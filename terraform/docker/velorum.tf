@@ -45,4 +45,10 @@ resource "docker_container" "velorum" {
   ]
 
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }

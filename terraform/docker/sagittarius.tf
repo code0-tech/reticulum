@@ -57,6 +57,12 @@ resource "docker_container" "sagittarius_rails_web" {
   }
 
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }
 
 resource "docker_container" "sagittarius_rails_background" {
@@ -98,6 +104,12 @@ resource "docker_container" "sagittarius_rails_background" {
 
   command = ["bundle", "exec", "good_job"]
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }
 
 resource "docker_container" "sagittarius_grpc" {
@@ -139,6 +151,12 @@ resource "docker_container" "sagittarius_grpc" {
 
   command = ["bin/grpc_server"]
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }
 
 resource "docker_container" "sagittarius_rails_cable" {
@@ -180,4 +198,10 @@ resource "docker_container" "sagittarius_rails_cable" {
 
   command = ["bundle", "exec", "puma", "config.cable.ru"]
   restart = "unless-stopped"
+
+  lifecycle {
+    replace_triggered_by = [
+      docker_container.config_generator.id
+    ]
+  }
 }
