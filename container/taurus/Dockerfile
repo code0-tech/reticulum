@@ -14,7 +14,7 @@ RUN cargo chef cook --release --recipe-path recipe.json -p taurus
 COPY projects/taurus .
 RUN cargo build --release -p taurus
 
-FROM alpine:3.23
+FROM alpine:3.24
 
 RUN apk --update add libc6-compat
 COPY --from=builder /taurus/target/release/taurus /taurus
