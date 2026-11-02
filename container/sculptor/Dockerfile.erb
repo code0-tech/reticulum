@@ -46,5 +46,6 @@ WORKDIR /sculptor
 
 COPY --from=build /sculptor/package.json package.json
 COPY --from=build /sculptor/.next/standalone .next/standalone
+COPY projects/sculptor/templates templates
 
 ENTRYPOINT ["npm", "run", "start"]
