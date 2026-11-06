@@ -1,6 +1,6 @@
 data "docker_registry_image" "nginx" {
   count = local.ide_enabled ? 1 : 0
-  name  = "nginx:1.31.3-alpine-otel"
+  name  = "nginx:1.31.7-alpine-otel"
 }
 
 resource "docker_image" "nginx" {
