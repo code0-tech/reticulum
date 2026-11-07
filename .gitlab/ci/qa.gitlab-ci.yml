@@ -6,9 +6,9 @@
 #   qa:external        run the suite against an already-running deployment (staging)
 #                      given QA_BASE_URL — no build, no seed. The "isolated" mode.
 #
-# All jobs are opt-in (gated on $RUN_QA, except qa:external which triggers on
-# $QA_BASE_URL) so adding them never disturbs the existing build pipeline. Flip
-# RUN_QA="true" (or set QA_BASE_URL) as a pipeline/schedule variable to run them.
+# qa:docker-compose runs AUTOMATICALLY on every pipeline (set RUN_QA="false" to opt
+# out). qa:terraform is opt-in (RUN_QA="true") to avoid the extra terraform overhead,
+# and qa:external triggers when $QA_BASE_URL is provided.
 
 # --- Shared defaults ---------------------------------------------------------
 .qa:
@@ -60,8 +60,11 @@ qa:docker-compose:
     - manifest:aquila
     - manifest:taurus
     - manifest:postgresql
+  # Runs automatically on every pipeline. Set RUN_QA="false" to opt out.
   rules:
-    - if: '$RUN_QA == "true"'
+    - if: '$RUN_QA == "false"'
+      when: never
+    - when: on_success
   variables:
     # Point the product compose at the CI-built images.
     IMAGE_REGISTRY: "ghcr.io/code0-tech/reticulum/ci-builds"
