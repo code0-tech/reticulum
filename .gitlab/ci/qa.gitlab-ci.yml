@@ -18,11 +18,13 @@
     - .default-retry
   image: ghcr.io/code0-tech/build-images/reticulum-builder:227.1-ruby-3.4.7-amd64
   variables:
-    # QA user the suite logs in as (seeded for local deployments).
-    QA_USER_EMAIL: "qa-admin@example.com"
-    QA_USER_PASSWORD: "qa-password-123"
-    QA_USER_USERNAME: "qa-admin"
-    QA_RUNTIME_TOKEN: "runtime_token"
+    # QA user the suite logs in as. Matches the stack's native seeding
+    # (sagittarius INITIAL_ROOT_MAIL/PASSWORD + INITIAL_RUNTIME_TOKEN); override
+    # these as pipeline variables when targeting staging/external.
+    QA_USER_EMAIL: "root@code0.tech"
+    QA_USER_PASSWORD: "root"
+    QA_USER_USERNAME: "root"
+    QA_RUNTIME_TOKEN: "runtime"
     QA_HEADLESS: "true"
     QA_WEBDRIVER_INSECURE: "true"
   artifacts:
@@ -70,9 +72,16 @@ qa:docker-compose:
     IMAGE_REGISTRY: "ghcr.io/code0-tech/reticulum/ci-builds"
     IMAGE_TAG: "$RETICULUM_CONTAINER_VERSION"
     IMAGE_EDITION: "ce"
-    # The REST/cron actions are built in centaurus, not here. Provide a published
-    # action tag as a pipeline variable (defaults to "main" if unset).
-    ACTION_IMAGE_TAG: "${ACTION_IMAGE_TAG:-main}"
+    # The REST/cron actions are built in CENTAURUS (not here) and pushed per-commit
+    # to ghcr.io/code0-tech/centaurus/ci-builds/{rest,cron}-action with a tag of the
+    # form "0.0.0-experimental-<centaurus-pipeline-id>-<centaurus-sha>". There is no
+    # floating "main"/"latest" tag, so a concrete tag must be supplied.
+    #
+    # Set ACTION_IMAGE_TAG as a project/pipeline variable pointing at a current
+    # centaurus build (pipeline variables override this job default). The value
+    # below is a known-good build and is a fallback only — keep it in sync with
+    # centaurus, since experimental tags may be pruned by ghcr-cleanup.
+    ACTION_IMAGE_TAG: "0.0.0-experimental-2996356141-d7401aa8f929ed67c3b49300e9d4abec8b4b0c11"
     # Run the platform + runtime, but NOT velorum (needs model API keys).
     COMPOSE_PROFILES: "ide,runtime"
     COMPOSE: >-
