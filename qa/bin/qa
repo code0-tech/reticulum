@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Entry point for the CodeZero QA suite.
+# Passes all arguments through to RSpec. With no path argument, runs the whole suite.
+#
+#   bin/qa                                   # whole suite
+#   bin/qa --tag smoke                       # only :smoke specs
+#   bin/qa qa/specs/features/login           # one directory / file
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# Always emit a JUnit report (consumed by CI) alongside the human-readable output.
+mkdir -p tmp
+JUNIT=(--format RspecJunitFormatter --out tmp/rspec.xml --format documentation)
+
+if [ $# -eq 0 ]; then
+  exec bundle exec rspec "${JUNIT[@]}" qa/specs
+else
+  exec bundle exec rspec "${JUNIT[@]}" "$@"
+fi

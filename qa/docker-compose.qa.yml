@@ -1,0 +1,60 @@
+# QA override for the product docker-compose stack.
+#
+# Adds a Selenium browser and a QA runner to the SAME network as the running
+# deployment, so both the GraphQL client and the browser resolve the deployment
+# by service name (http://nginx). No host bind-mounts, so it works identically on
+# a laptop and in GitLab dind.
+#
+# Local use (from the repo root):
+#   docker compose \
+#     -f docker-compose/docker-compose.yml --env-file docker-compose/.env \
+#     -f qa/docker-compose.qa.yml \
+#     up -d                              # bring up the stack (qa/selenium are profile-gated)
+#   docker compose \
+#     -f docker-compose/docker-compose.yml --env-file docker-compose/.env \
+#     -f qa/docker-compose.qa.yml \
+#     run --build --rm qa                # build + run the suite against the stack
+#
+# `qa` and `selenium` sit behind the `qa` profile, so a plain `up -d` of the
+# product stack ignores them; `run qa` starts `qa` and (via depends_on) `selenium`.
+services:
+  selenium:
+    image: selenium/standalone-chrome:131.0
+    profiles: [qa]
+    shm_size: "2gb"
+    # No published ports needed: the qa runner reaches it in-network at selenium:4444.
+
+  qa:
+    build:
+      context: .
+      dockerfile: Dockerfile.qa
+    profiles: [qa]
+    depends_on:
+      - selenium
+    environment:
+      # Front door of the running deployment, reachable in-network.
+      QA_BASE_URL: ${QA_BASE_URL:-http://nginx}
+      QA_GRAPHQL_PATH: ${QA_GRAPHQL_PATH:-/graphql}
+      # Drive a remote Selenium grid rather than a local Chrome.
+      QA_SELENIUM_URL: ${QA_SELENIUM_URL:-http://selenium:4444/wd/hub}
+      QA_HEADLESS: "true"
+      QA_WEBDRIVER_INSECURE: "true"
+      # Seeding: the runner cannot `docker compose exec` from inside the network, so
+      # local/CI seeding is done by the CI job BEFORE `run qa` (see qa.gitlab-ci.yml).
+      # Leave QA_SEED=false here; set the credentials the job seeded.
+      QA_SEED: ${QA_SEED:-false}
+      QA_DEPLOYMENT: ${QA_DEPLOYMENT:-docker-compose}
+      # Defaults match the stack's native seeding (INITIAL_ROOT_* / INITIAL_RUNTIME_TOKEN).
+      QA_USER_EMAIL: ${QA_USER_EMAIL:-root@code0.tech}
+      QA_USER_PASSWORD: ${QA_USER_PASSWORD:-root}
+      QA_USER_USERNAME: ${QA_USER_USERNAME:-root}
+      QA_RUNTIME_TOKEN: ${QA_RUNTIME_TOKEN:-runtime}
+      QA_SCREENSHOTS_DIR: /qa/tmp/screenshots
+    volumes:
+      - qa-artifacts:/qa/tmp
+    # bin/qa (the image entrypoint) already emits the JUnit report + docs output;
+    # just point it at the spec dir.
+    command: ["qa/specs"]
+
+volumes:
+  qa-artifacts:

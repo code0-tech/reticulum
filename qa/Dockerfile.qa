@@ -1,0 +1,21 @@
+# Runner image for the CodeZero QA suite.
+#
+# Built so the suite can run *inside* the deployment's docker network (resolving
+# `nginx`, `sagittarius-grpc`, `selenium` by service name) with no host bind-mounts,
+# which keeps it portable to GitLab dind. See qa/docker-compose.qa.yml.
+FROM ruby:3.4
+
+WORKDIR /qa
+
+# Install gems first for layer caching.
+COPY Gemfile Gemfile.lock* ./
+RUN bundle install
+
+# The suite itself.
+COPY . .
+
+# curl is used by support/wait_for_http.
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["bin/qa"]

@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby "~> 3.4"
+
+# Test runner
+gem "rspec", "~> 3.13"
+gem "rspec-retry", "~> 0.6" # retry flaky browser specs
+gem "rspec_junit_formatter", "~> 0.6" # JUnit XML for GitLab CI test reports
+
+# Browser automation (GitLab-QA style)
+gem "capybara", "~> 3.40"
+gem "selenium-webdriver", "~> 4.27"
+
+# API / runtime assertions
+gem "faraday", "~> 2.12"       # GraphQL over HTTP
+gem "faraday-retry", "~> 2.2"
+
+# Helpers
+gem "rainbow", "~> 3.1"        # colored logging
+gem "activesupport", "~> 8.0"  # String/Hash niceties, deep symbolize
+
+group :development do
+  gem "rubocop", "~> 1.69", require: false
+end

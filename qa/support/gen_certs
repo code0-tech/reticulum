@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+# Generate a self-signed TLS cert for the docker-compose stack's nginx.
+#
+# nginx's generated config has a `listen 443 ssl` block referencing
+# certs/<hostname>.pem and <hostname>.key, so `nginx -t` fails at boot if they
+# are absent — even though the QA suite talks to nginx over plain HTTP (port 80).
+# This produces throwaway certs so nginx starts.
+#
+# Usage: qa/support/gen_certs [CERT_DIR] [HOSTNAME]
+#   defaults: CERT_DIR=docker-compose/certs  HOSTNAME=localhost
+set -eu
+
+CERT_DIR="${1:-docker-compose/certs}"
+HOSTNAME_VALUE="${2:-localhost}"
+
+mkdir -p "$CERT_DIR"
+
+if [ -s "$CERT_DIR/$HOSTNAME_VALUE.pem" ] && [ -s "$CERT_DIR/$HOSTNAME_VALUE.key" ]; then
+  echo "Certs already present in $CERT_DIR; skipping"
+  exit 0
+fi
+
+openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+  -keyout "$CERT_DIR/$HOSTNAME_VALUE.key" \
+  -out "$CERT_DIR/$HOSTNAME_VALUE.pem" \
+  -subj "/CN=$HOSTNAME_VALUE" \
+  -addext "subjectAltName=DNS:$HOSTNAME_VALUE,DNS:nginx,DNS:localhost"
+
+echo "Generated self-signed cert for $HOSTNAME_VALUE in $CERT_DIR"
