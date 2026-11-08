@@ -100,9 +100,32 @@ variable "nginx_additional_network" {
   default     = null
 }
 
-variable "opentelemetry_enabled" {
-  type    = bool
-  default = false
+variable "opentelemetry" {
+  type = object({
+    enabled               = optional(bool, false)
+    grpc_host             = optional(string, "")
+    logs_http_endpoint    = optional(string, "")
+    metrics_http_endpoint = optional(string, "")
+    traces_http_endpoint  = optional(string, "")
+
+    logs_clientside_http_endpoint    = optional(string, "")
+    metrics_clientside_http_endpoint = optional(string, "")
+    traces_clientside_http_endpoint  = optional(string, "")
+
+    service_names = optional(object({
+      sculptor               = optional(string, "sculptor")
+      sculptor_clientside    = optional(string, "sculptor-clientside")
+      sagittarius_web        = optional(string, "sagittarius-web")
+      sagittarius_cable      = optional(string, "sagittarius-cable")
+      sagittarius_grpc       = optional(string, "sagittarius-grpc")
+      sagittarius_background = optional(string, "sagittarius-background")
+      sagittarius_gateway    = optional(string, "sagittarius-gateway")
+      nginx                  = optional(string, "nginx")
+      aquila                 = optional(string, "aquila")
+    }), {})
+  })
+  default     = {}
+  description = "OpenTelemetry configuration"
 }
 
 variable "ssl_enabled" {
@@ -148,81 +171,6 @@ variable "few_shots_external_config_path" {
   description = "Absolute host path to velorum.few_shots_external.configuration.json."
   type        = string
   default     = "{}"
-}
-
-variable "otel_service_name_sculptor" {
-  type    = string
-  default = "sculptor"
-}
-
-variable "otel_service_name_sagittarius_web" {
-  type    = string
-  default = "sagittarius-web"
-}
-
-variable "otel_service_name_sagittarius_cable" {
-  type    = string
-  default = "sagittarius-cable"
-}
-
-variable "otel_service_name_sagittarius_grpc" {
-  type    = string
-  default = "sagittarius-grpc"
-}
-
-variable "otel_service_name_sagittarius_background" {
-  type    = string
-  default = "sagittarius-background"
-}
-
-variable "otel_service_name_sagittarius_gateway" {
-  type    = string
-  default = "sagittarius-gateway"
-}
-
-variable "otel_service_name_nginx" {
-  type    = string
-  default = "nginx"
-}
-
-variable "otel_service_name_aquila" {
-  type    = string
-  default = "aquila"
-}
-
-variable "otel_logs_http_endpoint" {
-  type    = string
-  default = ""
-}
-
-variable "otel_metrics_http_endpoint" {
-  type    = string
-  default = ""
-}
-
-variable "otel_traces_http_endpoint" {
-  type    = string
-  default = ""
-}
-
-variable "otel_service_name_sculptor_clientside" {
-  type    = string
-  default = "sculptor-clientside"
-}
-
-variable "otel_logs_clientside_http_endpoint" {
-  type    = string
-  default = ""
-}
-
-variable "otel_metrics_clientside_http_endpoint" {
-  type    = string
-  default = ""
-}
-
-variable "otel_traces_clientside_http_endpoint" {
-  type    = string
-  default = ""
 }
 
 variable "config_generator_env" {
@@ -278,8 +226,8 @@ variable "additional_sagittarius_config" {
     Will override any other configuration variables or defaults.
     Must be valid YAML.
   EOT
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
 
 locals {
@@ -333,24 +281,24 @@ locals {
     "VELORUM_PORT=50051",
     "VELORUM_JWT_SECRET=${random_password.velorum_jwt_secret.result}",
 
-    "OPENTELEMETRY_ENABLED=${var.opentelemetry_enabled}",
-    "OPENTELEMETRY_GRPC_HOST=http://localhost:4317",
-    "OPENTELEMETRY_LOGS_HTTP_ENDPOINT=${var.otel_logs_http_endpoint}",
-    "OPENTELEMETRY_METRICS_HTTP_ENDPOINT=${var.otel_metrics_http_endpoint}",
-    "OPENTELEMETRY_TRACES_HTTP_ENDPOINT=${var.otel_traces_http_endpoint}",
-    "OPENTELEMETRY_LOGS_CLIENTSIDE_HTTP_ENDPOINT=${var.otel_logs_clientside_http_endpoint}",
-    "OPENTELEMETRY_METRICS_CLIENTSIDE_HTTP_ENDPOINT=${var.otel_metrics_clientside_http_endpoint}",
-    "OPENTELEMETRY_TRACES_CLIENTSIDE_HTTP_ENDPOINT=${var.otel_traces_clientside_http_endpoint}",
+    "OPENTELEMETRY_ENABLED=${var.opentelemetry.enabled}",
+    "OPENTELEMETRY_GRPC_HOST=${var.opentelemetry.grpc_host}",
+    "OPENTELEMETRY_LOGS_HTTP_ENDPOINT=${var.opentelemetry.logs_http_endpoint}",
+    "OPENTELEMETRY_METRICS_HTTP_ENDPOINT=${var.opentelemetry.metrics_http_endpoint}",
+    "OPENTELEMETRY_TRACES_HTTP_ENDPOINT=${var.opentelemetry.traces_http_endpoint}",
+    "OPENTELEMETRY_LOGS_CLIENTSIDE_HTTP_ENDPOINT=${var.opentelemetry.logs_clientside_http_endpoint}",
+    "OPENTELEMETRY_METRICS_CLIENTSIDE_HTTP_ENDPOINT=${var.opentelemetry.metrics_clientside_http_endpoint}",
+    "OPENTELEMETRY_TRACES_CLIENTSIDE_HTTP_ENDPOINT=${var.opentelemetry.traces_clientside_http_endpoint}",
 
-    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_WEB=${var.otel_service_name_sagittarius_web}",
-    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_CABLE=${var.otel_service_name_sagittarius_cable}",
-    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_GRPC=${var.otel_service_name_sagittarius_grpc}",
-    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_BACKGROUND=${var.otel_service_name_sagittarius_background}",
-    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_GATEWAY=${var.otel_service_name_sagittarius_gateway}",
-    "OPENTELEMETRY_SERVICE_NAME_NGINX=${var.otel_service_name_nginx}",
-    "OPENTELEMETRY_SERVICE_NAME_AQUILA=${var.otel_service_name_aquila}",
-    "OPENTELEMETRY_SERVICE_NAME_SCULPTOR=${var.otel_service_name_sculptor}",
-    "OPENTELEMETRY_SERVICE_NAME_SCULPTOR_CLIENTSIDE=${var.otel_service_name_sculptor_clientside}",
+    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_WEB=${var.opentelemetry.service_names.sagittarius_web}",
+    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_CABLE=${var.opentelemetry.service_names.sagittarius_cable}",
+    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_GRPC=${var.opentelemetry.service_names.sagittarius_grpc}",
+    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_BACKGROUND=${var.opentelemetry.service_names.sagittarius_background}",
+    "OPENTELEMETRY_SERVICE_NAME_SAGITTARIUS_GATEWAY=${var.opentelemetry.service_names.sagittarius_gateway}",
+    "OPENTELEMETRY_SERVICE_NAME_NGINX=${var.opentelemetry.service_names.nginx}",
+    "OPENTELEMETRY_SERVICE_NAME_AQUILA=${var.opentelemetry.service_names.aquila}",
+    "OPENTELEMETRY_SERVICE_NAME_SCULPTOR=${var.opentelemetry.service_names.sculptor}",
+    "OPENTELEMETRY_SERVICE_NAME_SCULPTOR_CLIENTSIDE=${var.opentelemetry.service_names.sculptor_clientside}",
 
     "SAGITTARIUS_RAILS_HOST=${var.project_name}-sagittarius-rails-web",
     "SAGITTARIUS_RAILS_PORT=3000",
