@@ -20,6 +20,7 @@ COPY projects/sculptor/src/instrumentation.ts src/instrumentation.ts
 COPY projects/sculptor/src/instrumentation-node.ts src/instrumentation-node.ts
 COPY projects/sculptor/src/instrumentation-client.ts src/instrumentation-client.ts
 COPY projects/sculptor/src/middleware.ts src/middleware.ts
+COPY projects/sculptor/templates templates
 COPY projects/sculptor/src/hooks src/hooks
 COPY projects/sculptor/src/app src/app
 COPY projects/sculptor/src/packages/ce src/packages/ce
@@ -46,6 +47,5 @@ WORKDIR /sculptor
 
 COPY --from=build /sculptor/package.json package.json
 COPY --from=build /sculptor/.next/standalone .next/standalone
-COPY projects/sculptor/templates templates
 
 ENTRYPOINT ["npm", "run", "start"]
