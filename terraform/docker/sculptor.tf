@@ -20,15 +20,15 @@ resource "docker_container" "sculptor" {
   }
 
   env = concat([
-    "OPENTELEMETRY_ENABLED=${var.opentelemetry_enabled}",
-    "OTEL_SERVICE_NAME=${var.otel_service_name_sculptor}",
-    "OTEL_LOGS_ENDPOINT=${var.otel_logs_http_endpoint}",
-    "OTEL_METRICS_ENDPOINT=${var.otel_metrics_http_endpoint}",
-    "OTEL_TRACES_ENDPOINT=${var.otel_traces_http_endpoint}",
-    "NEXT_PUBLIC_OTEL_SERVICE_NAME=${var.otel_service_name_sculptor_clientside}",
-    "NEXT_PUBLIC_OTEL_LOGS_ENDPOINT=${var.otel_logs_clientside_http_endpoint}",
-    "NEXT_PUBLIC_OTEL_METRICS_ENDPOINT=${var.otel_metrics_clientside_http_endpoint}",
-    "NEXT_PUBLIC_OTEL_TRACES_ENDPOINT=${var.otel_traces_clientside_http_endpoint}",
+    "OPENTELEMETRY_ENABLED=${var.opentelemetry.enabled}",
+    "OTEL_SERVICE_NAME=${var.opentelemetry.service_names.sculptor}",
+    "OTEL_LOGS_ENDPOINT=${var.opentelemetry.logs_http_endpoint}",
+    "OTEL_METRICS_ENDPOINT=${var.opentelemetry.metrics_http_endpoint}",
+    "OTEL_TRACES_ENDPOINT=${var.opentelemetry.traces_http_endpoint}",
+    "NEXT_PUBLIC_OTEL_SERVICE_NAME=${var.opentelemetry.service_names.sculptor_clientside}",
+    "NEXT_PUBLIC_OTEL_LOGS_ENDPOINT=${var.opentelemetry.logs_clientside_http_endpoint}",
+    "NEXT_PUBLIC_OTEL_METRICS_ENDPOINT=${var.opentelemetry.metrics_clientside_http_endpoint}",
+    "NEXT_PUBLIC_OTEL_TRACES_ENDPOINT=${var.opentelemetry.traces_clientside_http_endpoint}",
   ], var.sculptor_env)
 
   entrypoint = [

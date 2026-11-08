@@ -8,3 +8,10 @@ output "aquila_network" {
     name = local.runtime_enabled ? docker_network.aquila[0].name : null
   }
 }
+
+output "default_network" {
+  value = {
+    id   = docker_network.default.id
+    name = docker_network.default.name
+  }
+}
