@@ -36,6 +36,10 @@ module QA
         end
       end
 
+      def path
+        self.class.path
+      end
+
       # --- Navigation ----------------------------------------------------------
 
       def visit!

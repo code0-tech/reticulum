@@ -16,7 +16,7 @@ module QA
         expect(dashboard).to have_project(name)
       end
 
-      it "creates a project via the API in the personal namespace", :api, :smoke do
+      it "creates a project via the API in the personal namespace", :api, :smoke, :authenticated do
         namespace = Resource::Namespace.personal
         project = Resource::Project.fabricate_via_api! do |p|
           p.namespace = namespace

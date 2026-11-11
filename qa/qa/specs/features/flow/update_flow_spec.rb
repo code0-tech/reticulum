@@ -13,7 +13,7 @@ module QA
       project&.remove_via_api!
     end
 
-    it "renames an existing flow", :orchestrated do
+    it "renames an existing flow", :orchestrated, :authenticated do
       @flow = Resource::Flow.fabricate_via_api! do |f|
         f.project = project
         f.flow_type_id = flow_type_id

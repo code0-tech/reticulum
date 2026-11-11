@@ -29,7 +29,7 @@ module QA
       project&.remove_via_api!
     end
 
-    it "triggers a manual execution and records a result", :orchestrated do
+    it "triggers a manual execution and records a result", :orchestrated, :authenticated do
       @flow = Resource::Flow.fabricate_via_api! do |f|
         f.project = project
         f.flow_type_id = flow_type_id
@@ -49,7 +49,7 @@ module QA
       expect(result).to have_key("finishedAt")
     end
 
-    it "runs a flow from the builder's manual-execution dialog", :browser do
+    it "runs a flow from the builder's manual-execution dialog", :browser, :authenticated do
       @flow = Resource::Flow.fabricate_via_api! do |f|
         f.project = project
         f.flow_type_id = flow_type_id

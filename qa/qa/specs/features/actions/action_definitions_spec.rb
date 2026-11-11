@@ -15,7 +15,7 @@ module QA
       action.wait_until_connected!
     end
 
-    it "exposes the REST action's definitions on the runtime", :orchestrated do
+    it "exposes the REST action's definitions on the runtime", :orchestrated, :authenticated do
       # A trigger flow type (the thing a flow is built on) must be available.
       expect(action.flow_type_count).to be > 0
 
@@ -23,7 +23,7 @@ module QA
       expect(action.function_definition_count).to be >= 0
     end
 
-    it "makes at least one flow type discoverable for flow creation", :orchestrated do
+    it "makes at least one flow type discoverable for flow creation", :orchestrated, :authenticated do
       expect { Resource::Flow.discover_flow_type_id(runtime: runtime) }.not_to raise_error
     end
   end

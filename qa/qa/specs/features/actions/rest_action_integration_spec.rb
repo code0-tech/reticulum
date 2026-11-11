@@ -19,7 +19,7 @@ module QA
 
     after { project&.remove_via_api! }
 
-    it "offers the connected action's trigger when creating a flow", :browser do
+    it "offers the connected action's trigger when creating a flow", :browser, :authenticated do
       dashboard = sign_in_via_ui
       skip "Project navigation selector not available" unless dashboard.has_project?(project.name)
 
@@ -30,7 +30,7 @@ module QA
       expect(flow_create).to have_element("flow-create-trigger-select-item")
     end
 
-    it "exposes the action as a selectable flow type via the API", :orchestrated, :smoke do
+    it "exposes the action as a selectable flow type via the API", :orchestrated, :smoke, :authenticated do
       flow_type_id = Resource::Flow.discover_flow_type_id(runtime: runtime)
       expect(flow_type_id).to be_a(String).and(satisfy { |s| !s.empty? })
     end

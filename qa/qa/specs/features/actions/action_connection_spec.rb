@@ -10,7 +10,7 @@ module QA
     let(:runtime) { Resource::Runtime.global }
     let(:action) { Resource::Action.new(runtime: runtime) }
 
-    it "reports the REST action connected to the runtime", :orchestrated, :smoke do
+    it "reports the REST action connected to the runtime", :orchestrated, :smoke, :authenticated do
       runtime.wait_until_running!
       expect(runtime.status).to eq(Resource::Runtime::RUNNING)
 

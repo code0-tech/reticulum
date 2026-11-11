@@ -10,7 +10,7 @@ module QA
 
     after { project&.remove_via_api! }
 
-    it "deletes a flow and it no longer resolves", :orchestrated do
+    it "deletes a flow and it no longer resolves", :orchestrated, :authenticated do
       flow = Resource::Flow.fabricate_via_api! do |f|
         f.project = project
         f.flow_type_id = flow_type_id

@@ -46,6 +46,8 @@ RSpec.configure do |config|
     QA::Runtime::ApiClient.default # memoized login; fails fast if creds/URL are wrong
   end
 
+  config.before(:each, :authenticated) { sign_in_via_ui }
+
   # Capture a screenshot + HTML on browser-spec failure for debugging.
   config.after(:each, :browser) do |example|
     next unless example.exception
