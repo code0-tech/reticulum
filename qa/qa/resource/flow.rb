@@ -51,7 +51,13 @@ module QA
           mutation($id: FlowID!, $flow: FlowInput!) {
             namespacesProjectsFlowsUpdate(input: { flowId: $id, flowInput: $flow }) {
               flow { id name validationStatus }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -73,7 +79,13 @@ module QA
               flowId: $flowId, runtimeId: $runtimeId, input: $input
             }) {
               executionIdentifier
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -117,7 +129,13 @@ module QA
           mutation($projectId: NamespaceProjectID!, $flow: FlowInput!) {
             namespacesProjectsFlowsCreate(input: { projectId: $projectId, flow: $flow }) {
               flow { id name validationStatus }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -137,7 +155,13 @@ module QA
         graphql = <<~GQL
           mutation($id: FlowID!) {
             namespacesProjectsFlowsDelete(input: { flowId: $id }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

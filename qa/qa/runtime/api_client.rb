@@ -52,7 +52,13 @@ module QA
           mutation($email: String, $username: String, $password: String!) {
             usersLogin(input: { email: $email, username: $username, password: $password }) {
               userSession { active token }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

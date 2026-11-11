@@ -27,7 +27,13 @@ module QA
           mutation($name: String!) {
             organizationsCreate(input: { name: $name }) {
               organization { id name namespace { id } }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -47,7 +53,13 @@ module QA
         graphql = <<~GQL
           mutation($id: OrganizationID!) {
             organizationsDelete(input: { organizationId: $id }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

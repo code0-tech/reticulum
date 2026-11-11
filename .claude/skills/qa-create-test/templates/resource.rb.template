@@ -27,7 +27,13 @@ module QA
           mutation({{$parentId: ParentID!, $name: String!}}) {
             {{graphqlCreateMutation}}(input: { {{parentId: $parentId, name: $name}} }) {
               {{payloadField}} { id {{name}} }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -49,7 +55,13 @@ module QA
         graphql = <<~GQL
           mutation($id: {{EntityID}}!) {
             {{graphqlDeleteMutation}}(input: { {{entityId: $id}} }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

@@ -105,7 +105,13 @@ module QA
           mutation($name: String!, $description: String, $namespaceId: NamespaceID) {
             runtimesCreate(input: { name: $name, description: $description, namespaceId: $namespaceId }) {
               runtime { id name token }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -125,7 +131,13 @@ module QA
         graphql = <<~GQL
           mutation($id: RuntimeID!) {
             runtimesDelete(input: { runtimeId: $id }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

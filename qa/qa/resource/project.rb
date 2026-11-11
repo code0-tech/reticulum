@@ -42,7 +42,13 @@ module QA
               namespaceId: $namespaceId, name: $name, slug: $slug, description: $description
             }) {
               namespaceProject { id name }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -67,7 +73,13 @@ module QA
         graphql = <<~GQL
           mutation($id: NamespaceProjectID!) {
             namespacesProjectsDelete(input: { namespaceProjectId: $id }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

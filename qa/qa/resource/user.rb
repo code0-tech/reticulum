@@ -32,7 +32,13 @@ module QA
               email: $email, username: $username, password: $password, passwordRepeat: $password
             }) {
               userSession { token user { id username namespace { id } } }
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL
@@ -54,7 +60,13 @@ module QA
         graphql = <<~GQL
           mutation($id: UserID!) {
             usersDelete(input: { userId: $id }) {
-              errors { message }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
             }
           }
         GQL

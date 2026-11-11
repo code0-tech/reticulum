@@ -81,4 +81,10 @@ backend/runtime), **Page** (`qa/qa/page/`, Capybara page objects over `data-qa-s
 - Never invent GraphQL fields, mutation names, or `data-qa-selector` values — read them from
   `sagittarius/app/graphql` and the sculptor source.
 - Keep browser specs minimal and resilient (selectors only, generous waits via `wait_for_element`).
-- Always select `errors { message }` in every mutation and always add cleanup.
+- Always select `errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }` in every mutation and always add cleanup.
