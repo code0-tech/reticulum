@@ -89,7 +89,7 @@ module QA
       def execute(graphql, variables:, authenticated:)
         response = connection.post(@graphql_url) do |req|
           req.headers["Content-Type"] = "application/json"
-          req.headers["Authorization"] = "Bearer #{@token}" if authenticated && @token
+          req.headers["Authorization"] = "Session #{@token}" if authenticated && @token
           req.body = JSON.generate(query: graphql, variables: variables)
         end
 
