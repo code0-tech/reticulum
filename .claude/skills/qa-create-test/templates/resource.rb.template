@@ -1,0 +1,72 @@
+# frozen_string_literal: true
+
+module QA
+  module Resource
+    # {{ONE_LINE_DESCRIPTION}} — a GraphQL API factory. Mirrors qa/qa/resource/project.rb.
+    class {{ClassName}} < Base
+      # Settable attributes the spec assigns before fabrication.
+      attr_accessor {{:attr_one, :attr_two}}
+
+      def initialize
+        # Sensible defaults so a spec can fabricate with zero setup.
+        {{@attr_one = "qa-#{SecureRandom.hex(4)}"}}
+      end
+
+      # Accept either a parent resource (responds to #id) or a raw id string.
+      def {{parent}}_id
+        {{parent}}.respond_to?(:id) ? {{parent}}.id : {{parent}}
+      end
+
+      private
+
+      # Returns [graphql_string, variables_hash]. Mutation name = Sagittarius class path
+      # minus `Mutations::`, `::` removed, first letter lowercased (verify in
+      # sagittarius/app/graphql/mutations/**). Always select `errors { message }`.
+      def api_create
+        graphql = <<~GQL
+          mutation({{$parentId: ParentID!, $name: String!}}) {
+            {{graphqlCreateMutation}}(input: { {{parentId: $parentId, name: $name}} }) {
+              {{payloadField}} { id {{name}} }
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
+            }
+          }
+        GQL
+        variables = { {{parentId: parent_id, name: name}} }.compact
+        [graphql, variables]
+      end
+
+      # Populate @id (and any read-back fields) from the mutation `data` hash.
+      def process_create_response(data)
+        node = data.dig("{{graphqlCreateMutation}}", "{{payloadField}}")
+        raise Runtime::ApiClient::Error, "{{ClassName}} create returned no {{payloadField}}" if node.nil?
+
+        @id = node.fetch("id")
+        {{@name = node.fetch("name")}}
+      end
+
+      # Optional cleanup. Return [graphql, vars]; return nil to skip.
+      def api_delete
+        graphql = <<~GQL
+          mutation($id: {{EntityID}}!) {
+            {{graphqlDeleteMutation}}(input: { {{entityId: $id}} }) {
+              errors {
+                errorCode
+                details {
+                  ...on ActiveModelError { attribute type }
+                  ...on MessageError { message }
+                }
+              }
+            }
+          }
+        GQL
+        [graphql, { id: id }]
+      end
+    end
+  end
+end

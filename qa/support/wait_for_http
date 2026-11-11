@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+# Poll an HTTP URL until it returns a 2xx/3xx, or time out.
+# Used by the QA CI jobs to wait for the nginx front door before running the suite.
+#
+# Usage: wait_for_http <url> [max_attempts] [delay_seconds]
+#   wait_for_http http://docker/health/liveness 60 3
+set -eu
+
+URL="${1:?usage: wait_for_http <url> [max_attempts] [delay_seconds]}"
+MAX="${2:-60}"
+DELAY="${3:-3}"
+
+i=1
+while [ "$i" -le "$MAX" ]; do
+  CODE="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$URL" 2>/dev/null || echo 000)"
+  case "$CODE" in
+    2??|3??)
+      echo "wait_for_http: $URL is up (HTTP $CODE) after $i attempt(s)"
+      exit 0
+      ;;
+  esac
+  echo "wait_for_http: attempt $i/$MAX -> HTTP $CODE; retrying in ${DELAY}s"
+  i=$((i + 1))
+  sleep "$DELAY"
+done
+
+echo "wait_for_http: timed out after $MAX attempts waiting for $URL" >&2
+exit 1

@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+# {{WHAT_THIS_PROVES}} — mirrors qa/specs/features/login/login_spec.rb.
+# Layer tag: :api (pure GraphQL) | :browser (pure UI) | :orchestrated (UI + API).
+# Add :smoke only for critical-path specs.
+module QA
+  RSpec.describe "{{Area}}", product_group: :{{group}} do
+    describe "{{Capability}}", :{{orchestrated}} do
+      # Prerequisites fabricated via the API (fast, deterministic).
+      let(:{{parent}}) { Resource::{{Parent}}.fabricate_via_api! { |r| {{r.name = "qa-#{SecureRandom.hex(4)}"}} } }
+
+      after do
+        # Tear down everything created, children first. Guard with &. in case setup failed.
+        {{@thing}}&.remove_via_api!
+        {{parent}}&.remove_via_api!
+      end
+
+      it "{{does the thing and is observable}}", :smoke do
+        # Act — via a page object (UI) ...
+        {{Page::Area::Thing.new.visit!.do_the_thing(arg: value)}}
+
+        # ... or via a resource (API):
+        # @thing = Resource::Thing.fabricate_via_api! { |t| t.parent = parent }
+
+        # Assert — via the UI ...
+        {{expect(page).to have_css(%([data-qa-selector="some-selector"]), wait: 20)}}
+
+        # ... and/or via the API (read-back / client query):
+        # data = Runtime::ApiClient.default.query(<<~GQL, variables: { id: @thing.id })
+        #   query($id: ThingID!) { thing(id: $id) { id status } }
+        # GQL
+        # expect(data.dig("thing", "status")).to eq("RUNNING")
+      end
+    end
+  end
+end

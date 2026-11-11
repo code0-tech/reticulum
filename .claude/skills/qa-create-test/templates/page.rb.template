@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+module QA
+  module Page
+    module {{Area}}
+      # {{ONE_LINE_DESCRIPTION}} — a sculptor page object. Mirrors qa/qa/page/auth/login.rb.
+      class {{ClassName}} < Page::Base
+        # URL path relative to QA_BASE_URL.
+        path "{{/some/path}}"
+        # data-qa-selector names this page depends on (verify in the sculptor source).
+        view_selectors %w[{{selector-one selector-two}}]
+
+        # Intention-revealing action built from Page::Base helpers
+        # (fill_element / click_element / has_element? / has_element_with_text? /
+        #  wait_for_element / wait_until).
+        def {{do_the_thing}}({{arg: nil}})
+          wait_for_element("{{selector-one}}")
+          {{fill_element("selector-one", arg)}}
+          {{click_element("selector-two")}}
+          self
+        end
+
+        # Optional: a predicate the spec can assert on.
+        def {{succeeded?}}
+          {{has_element?("some-success-selector")}}
+        end
+      end
+    end
+  end
+end
