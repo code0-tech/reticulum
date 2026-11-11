@@ -26,8 +26,8 @@ services:
 
   qa:
     build:
-      context: .
-      dockerfile: Dockerfile.qa
+      context: ../qa
+      dockerfile: ../qa/Dockerfile.qa
     profiles: [qa]
     depends_on:
       - selenium
