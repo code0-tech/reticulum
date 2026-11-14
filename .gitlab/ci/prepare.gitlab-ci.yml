@@ -15,3 +15,14 @@ generate-environment:
       dotenv: .gitlab/ci/env
     paths:
       - .gitlab/ci/env
+
+rubocop:qa:
+  stage: prepare
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:648.1-ruby-3.4.7-amd64
+  script:
+    - cd qa
+    - bundle install
+    - rubocop_exit_code=0; git_exit_code=0
+    - bundle exec rubocop -A || rubocop_exit_code=$?
+    - git diff --exit-code || git_exit_code=$?
+    - exit $(($rubocop_exit_code + $git_exit_code))

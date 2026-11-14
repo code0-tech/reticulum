@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'capybara', '~> 3.40', require: 'capybara/rspec'
+gem 'rspec', '~> 3.13'
+gem 'rspec_junit_formatter', '~> 0.8'
+gem 'selenium-webdriver', '~> 4.52'
+
+gem 'activesupport', '~> 8.1', require: 'active_support/all'
+gem 'faraday', '~> 2.15'
+
+gem 'rubocop', '~> 1.92'
+
+gem 'zeitwerk', '~> 2.8'
+
+gem 'semantic_logger', '~> 5.2', require: 'semantic_logger/sync'
