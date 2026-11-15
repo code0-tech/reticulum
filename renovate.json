@@ -5,6 +5,22 @@
     ":assignee(Taucher2003)",
     "customManagers:dockerfileVersions"
   ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update the reticulum-builder image used in the container CI jobs",
+      "managerFilePatterns": [
+        "/\\.gitlab/ci/container-build\\.gitlab-ci\\.yml$/",
+        "/\\.gitlab/ci/container-boot\\.gitlab-ci\\.yml$/"
+      ],
+      "matchStrings": [
+        "image:\\s*(?<depName>ghcr\\.io/code0-tech/build-images/reticulum-builder):(?<currentValue>\\S+?)-\\$PLATFORM"
+      ],
+      "datasourceTemplate": "docker",
+      "currentValueTemplate": "{{{currentValue}}}-amd64",
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-ruby-(?<patch>\\d+)\\.(?<build>\\d+)\\.(?<revision>\\d+)-(?<compatibility>.+)$"
+    }
+  ],
   "packageRules": [
     {
       "matchDepNames": ["ruby"],
