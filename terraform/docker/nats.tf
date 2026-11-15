@@ -1,6 +1,6 @@
 data "docker_registry_image" "nats" {
   count = local.runtime_enabled ? 1 : 0
-  name  = "nats:2.14.4"
+  name  = "nats:2.15.2"
 }
 
 resource "docker_image" "nats" {
