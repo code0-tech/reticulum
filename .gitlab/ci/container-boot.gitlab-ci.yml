@@ -5,7 +5,7 @@
   tags:
     - c0-$PLATFORM
   stage: container:boot
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:649.1-ruby-3.4.7-$PLATFORM
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:656.1-ruby-3.4.7
   variables:
     COMPOSE_FILE: support/docker-compose.yml
   parallel:
