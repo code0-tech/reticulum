@@ -1,0 +1,29 @@
+# QA_BASE_URL=http://reticulum.test/
+# QA_GRAPHQL_URL=http://code0.localhost/graphql
+# QA_SELENIUM_REMOTE_URL=http://localhost:4444
+# QA_TEST_USER_CREATE=true
+
+services:
+  # QA_CAPYBARA_DRIVER=firefox_bidi_remote
+  selenium-firefox:
+    profiles:
+      - firefox
+    image: selenium/standalone-firefox:157.0-20261101
+    shm_size: 2gb
+    ports:
+      - "4444:4444" # WebDriver endpoint (QA_SELENIUM_REMOTE_URL)
+      - "7900:7900" # noVNC viewer
+    extra_hosts:
+      - "reticulum.test:host-gateway"
+
+  # QA_CAPYBARA_DRIVER=chrome_bidi_remote
+  selenium-chrome:
+    profiles:
+      - chrome
+    image: selenium/standalone-chrome:156.0-20261101
+    shm_size: 2gb
+    ports:
+      - "4444:4444" # WebDriver endpoint (QA_SELENIUM_REMOTE_URL)
+      - "7900:7900" # noVNC viewer
+    extra_hosts:
+      - "reticulum.test:host-gateway"

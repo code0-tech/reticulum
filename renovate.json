@@ -9,6 +9,12 @@
     {
       "matchDepNames": ["ruby"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["selenium/standalone-**"],
+      "groupName": "selenium",
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<build>\\d+)$"
     }
   ]
 }

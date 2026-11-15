@@ -1,0 +1,27 @@
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+
+Metrics:
+  Enabled: false
+
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
+
+Naming/PredicateMethod:
+  AllowBangMethods: true
+
+Style/ArgumentsForwarding:
+  UseAnonymousForwarding: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyClassDefinition:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma

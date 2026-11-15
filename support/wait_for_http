@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Poll an HTTP URL until it responds successfully (2xx), or give up.
+#
+# Usage: wait_for_http <url> [retries] [backoff_seconds]
+#   retries  number of attempts        (default: 60)
+#   backoff  seconds between attempts   (default: 3)
+
+set -euo pipefail
+
+URL="${1:?usage: wait_for_http <url> [retries] [backoff]}"
+RETRIES="${2:-60}"
+BACKOFF="${3:-3}"
+
+for attempt in $(seq 1 "$RETRIES"); do
+  echo "Attempt $attempt/$RETRIES to reach $URL"
+  if curl --fail --silent --show-error --max-time 5 "$URL" >/dev/null 2>&1; then
+    echo "$URL is responding"
+    exit 0
+  fi
+  sleep "$BACKOFF"
+done
+
+echo "Timed out waiting for $URL after $RETRIES attempts" >&2
+exit 1
