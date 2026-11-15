@@ -5,7 +5,7 @@ qa:docker-compose:
     - .default-retry
   tags:
     - c0-amd64
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:649.1-ruby-3.4.7-amd64
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:651.1-ruby-3.4.7-amd64
   dependencies:
     - generate-environment
   services:
