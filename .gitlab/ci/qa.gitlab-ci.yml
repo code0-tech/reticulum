@@ -10,7 +10,7 @@ qa:docker-compose:
     - generate-environment
   services:
     - !reference [.dind, services]
-    - name: selenium/standalone-firefox:157.0-20261101
+    - name: selenium/standalone-firefox:159.0-20261101
       alias: selenium
   variables:
     FF_NETWORK_PER_BUILD: "true"
