@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module QA
-  RSpec.describe '02. Projects' do
+  RSpec.describe 'Projects' do
     describe 'Project creation', :browser do
       it 'creates a project in a fabricated organization via the UI' do
         organization = Resource::Organization.fabricate!(as: :test)
