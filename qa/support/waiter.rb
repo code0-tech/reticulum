@@ -3,6 +3,8 @@
 module QA
   module Support
     module Waiter
+      include SemanticLogger::Loggable
+
       TimeoutError = Class.new(StandardError)
 
       module_function
@@ -12,7 +14,8 @@ module QA
       # @param raise_errors [Boolean] raise errors from the block instead of retrying
       # @param message [String] shown if the wait times out
       # @return the block's truthy value
-      def wait_until(timeout: 30, interval: 1, raise_errors: false, message: 'condition not met')
+      def wait_until(timeout: 30, interval: 1, raise_errors: false, message: 'condition not met',
+                     log_retry_message: nil)
         deadline = monotonic + timeout
         last_error = nil
 
@@ -31,6 +34,7 @@ module QA
                                 "#{" (last error: #{last_error.message})" if last_error}"
           end
 
+          logger.warn(log_retry_message, retry_in: interval) if log_retry_message
           sleep interval
         end
       end

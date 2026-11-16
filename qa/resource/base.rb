@@ -118,9 +118,7 @@ module QA
         self
       end
 
-      protected
-
-      def model_id(global_id)
+      def model_id(global_id = id)
         global_id&.split('/')&.last
       end
 
