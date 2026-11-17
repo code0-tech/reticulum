@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 module QA
-  RSpec.describe '01. Authentication' do
+  RSpec.describe 'Authentication' do
     describe 'User login', :browser, :smoke do
       it 'signs in with valid credentials and reaches the dashboard' do
         page = Page::Auth::Login.new

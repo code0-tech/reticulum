@@ -7,4 +7,4 @@ container/sculptor/Dockerfile
 container/velorum/Dockerfile
 
 # downloaded projects
-projects
+/projects/
