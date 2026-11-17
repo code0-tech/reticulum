@@ -6,10 +6,7 @@ module QA
   RSpec.describe 'Authentication' do
     describe 'User login', :browser, :smoke do
       it 'signs in with valid credentials and reaches the dashboard' do
-        page = Page::Auth::Login.new
-        page.visit!
-
-        page.login(:test)
+        Page::Auth::Login.new.visit!.login
 
         Page::Dashboard::Home.new.open_user_settings
 

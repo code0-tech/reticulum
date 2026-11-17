@@ -6,9 +6,9 @@ module QA
   RSpec.describe 'Projects' do
     describe 'Project creation', :browser do
       it 'creates a project in a fabricated organization via the UI' do
-        organization = Resource::Organization.fabricate!(as: :test)
+        organization = Resource::Organization.fabricate!
 
-        Page::Auth::Login.new.visit!.login(:test)
+        Page::Auth::Login.new.visit!.login
 
         namespace_page = Page::Namespace::Show.new
         namespace_page.visit!(id: organization.namespace_model_id)

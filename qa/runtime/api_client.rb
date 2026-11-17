@@ -22,7 +22,7 @@ module QA
       GQL
 
       # @param user_type [Symbol] credential set to authenticate as (see Runtime::Credentials)
-      def initialize(user_type: :fabrication)
+      def initialize(user_type: :test)
         @user_type = user_type
         @graphql_url = Env.graphql_url
       end
