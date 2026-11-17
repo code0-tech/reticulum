@@ -88,16 +88,16 @@ variable "nginx_env" {
   default     = []
 }
 
-variable "nginx_additional_network" {
+variable "nginx_additional_networks" {
   description = <<-EOT
-    Name of an optional additional (externally managed) Docker network to
+    Names of optional additional (externally managed) Docker networks to
     attach the nginx container to, in addition to the module's default network.
-    Useful for joining a reverse-proxy network such as nginx-proxy. The network
-    must already exist; it is not created by this module. Defaults to null (no
+    Useful for joining a reverse-proxy network such as nginx-proxy. The networks
+    must already exist; they is not created by this module. Defaults to [] (no
     additional network).
   EOT
-  type        = string
-  default     = null
+  type        = list(string)
+  default     = []
 }
 
 variable "opentelemetry" {

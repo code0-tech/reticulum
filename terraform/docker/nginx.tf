@@ -30,7 +30,7 @@ resource "docker_container" "nginx" {
   }
 
   dynamic "networks_advanced" {
-    for_each = var.nginx_additional_network != null ? [var.nginx_additional_network] : []
+    for_each = var.nginx_additional_networks
     content {
       name = networks_advanced.value
     }
