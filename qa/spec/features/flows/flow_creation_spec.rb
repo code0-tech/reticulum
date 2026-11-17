@@ -6,10 +6,10 @@ module QA
   RSpec.describe 'Flows' do
     describe 'Flow creation', :browser do
       it 'creates a flow' do
-        organization = Resource::Organization.fabricate!(as: :test)
-        project = Resource::Project.fabricate!(as: :test) { |p| p.namespace_id = organization.namespace_id }
+        organization = Resource::Organization.fabricate!
+        project = Resource::Project.fabricate! { |p| p.namespace_id = organization.namespace_id }
 
-        Page::Auth::Login.new.visit!.login(:test)
+        Page::Auth::Login.new.visit!.login
 
         project_page = Page::Namespace::Project::Show.new
         project_page.visit!(namespace_id: organization.namespace_model_id, id: project.model_id)

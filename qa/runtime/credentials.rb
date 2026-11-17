@@ -9,12 +9,12 @@ module QA
 
       UnknownUserError = Class.new(Error)
 
-      def fabrication_user_email
-        @fabrication_user_email ||= env('QA_FABRICATION_USER_EMAIL', default: 'root@code0.tech')
+      def admin_user_email
+        @admin_user_email ||= env('QA_ADMIN_USER_EMAIL', default: 'root@code0.tech')
       end
 
-      def fabrication_user_password
-        @fabrication_user_password ||= env('QA_FABRICATION_USER_PASSWORD', default: 'root')
+      def admin_user_password
+        @admin_user_password ||= env('QA_ADMIN_USER_PASSWORD', default: 'root')
       end
 
       def test_user_email
@@ -31,8 +31,8 @@ module QA
 
       def user(type)
         case type
-        when :fabrication
-          { email: fabrication_user_email, password: fabrication_user_password }
+        when :admin
+          { email: admin_user_email, password: admin_user_password }
         when :test
           { email: test_user_email, password: test_user_password }
         else

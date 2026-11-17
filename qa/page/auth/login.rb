@@ -10,7 +10,7 @@ module QA
         element :password, 'auth-login-password'
         element :submit, 'auth-login-send'
 
-        def login(user_type)
+        def login(user_type = :test)
           user = Runtime::Credentials.user(user_type)
 
           logger.info('Logging in via browser ui', user_type: user_type, email: user[:email])

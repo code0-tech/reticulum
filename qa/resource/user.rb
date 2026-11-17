@@ -35,7 +35,7 @@ module QA
           u.username = creds[:email].split('@').first
         end
 
-        user.fabricate!(scope: :suite)
+        user.fabricate!(as: :admin, scope: :suite)
       rescue Base::MutationError => e
         raise unless e.validation?('taken', attribute: :email) || e.validation?('taken', attribute: :username)
 
