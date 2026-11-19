@@ -18,7 +18,7 @@ generate-environment:
 
 rubocop:qa:
   stage: prepare
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:656.1-ruby-3.4.7
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:673.1-ruby-3.4.13
   script:
     - cd qa
     - bundle install
