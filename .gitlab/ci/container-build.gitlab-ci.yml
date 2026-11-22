@@ -4,7 +4,7 @@
     - .default-retry
   tags:
     - c0-$PLATFORM
-  image: ghcr.io/code0-tech/build-images/reticulum-builder:673.1-ruby-3.4.13
+  image: ghcr.io/code0-tech/build-images/reticulum-builder:680.1-ruby-3.4.13
   stage: container
   variables:
     LABEL_PIPELINE_ID: 'false'
