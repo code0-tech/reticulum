@@ -82,6 +82,7 @@ module QA
         Capybara.run_server = false
         Capybara.default_driver = capybara_driver
         Capybara.save_path = screenshots_dir
+        Capybara.default_max_wait_time = 5
 
         logger.info('Capybara configured', base_url: Env.base_url, driver: capybara_driver)
       end
