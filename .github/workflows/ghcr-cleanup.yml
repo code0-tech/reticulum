@@ -1,0 +1,58 @@
+name: GHCR cleanup
+
+# Prunes the throwaway CI build images reticulum pushes to GHCR
+# (ghcr.io/code0-tech/reticulum/ci-builds/*). Every pipeline leaves a
+# pipeline-unique tagged manifest plus untagged per-platform digests behind,
+# and nothing is ever overwritten, so the registry grows without bound
+# (see issue #368).
+#
+# This does NOT touch anything pushed to GitLab (those are permanent) and does
+# NOT touch reticulum/ci-cache (the buildx registry cache) — only ci-builds.
+
+on:
+  schedule:
+    # Nightly, off the top of the hour to avoid scheduler congestion.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'List what would be deleted without actually deleting'
+        type: boolean
+        default: false
+
+permissions:
+  packages: write
+
+concurrency:
+  group: ghcr-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prune old ci-builds images
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          owner: code0-tech
+          # All ci-builds packages (aquila, taurus, sagittarius, sculptor,
+          # velorum, the base images, …). The glob excludes reticulum/ci-cache.
+          packages: 'reticulum/ci-builds/*'
+          # Always keep the 10 most recent tagged builds per image regardless of
+          # age, so a freshly pruned registry still has pullable images and we
+          # never end up trying to pull a version that no longer exists.
+          keep-n-tagged: 10
+          # Of everything beyond those 10, only delete what is older than 30 days.
+          older-than: 30 days
+          # Also sweep dangling untagged digests. The action is multi-arch aware:
+          # untagged platform children referenced by a retained manifest are kept,
+          # so pulls never break.
+          delete-untagged: true
+          # Re-check manifest/referrer integrity after deletion.
+          validate: true
+          dry-run: ${{ inputs.dry-run || false }}
+          # Org-owned packages are pushed with a PAT (C0_GH_TOKEN); deletion may
+          # likewise need a token with delete:packages. Provide GHCR_CLEANUP_TOKEN
+          # (classic PAT, read:packages + delete:packages) if the default
+          # GITHUB_TOKEN lacks permission on the org packages.
+          token: ${{ secrets.GHCR_CLEANUP_TOKEN || secrets.GITHUB_TOKEN }}
