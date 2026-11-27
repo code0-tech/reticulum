@@ -1,6 +1,6 @@
 data "docker_registry_image" "postgres" {
   count = local.ide_enabled ? 1 : 0
-  name  = "postgres:18.3"
+  name  = "postgres:18.6"
 }
 
 resource "docker_image" "postgres" {
