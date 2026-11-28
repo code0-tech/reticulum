@@ -10,7 +10,7 @@
     - generate-environment
   services:
     - !reference [.dind, services]
-    - name: selenium/standalone-firefox:157.0-20261101
+    - name: selenium/standalone-firefox:157.0-20261120
       alias: selenium
   variables:
     QA_BASE_URL: "http://docker"
